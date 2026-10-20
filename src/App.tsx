@@ -174,7 +174,7 @@ export default function App() {
             <button
               onClick={() => setIsAdminOpen(true)}
               className="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 transition-colors"
-              title="Staff / Admin Access (PIN: 1234)"
+              title="Staff / Admin Access"
               aria-label="Admin PIN Lock"
             >
               <User size={20} />
@@ -512,7 +512,7 @@ export default function App() {
             onClick={() => setIsAdminOpen(true)}
             className="text-[10px] text-slate-300 hover:text-slate-600 flex items-center gap-1 cursor-pointer transition-colors"
           >
-            <span>Staff Console (PIN: 1234)</span>
+            <span>Staff Console</span>
           </button>
         </div>
       </footer>

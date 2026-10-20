@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { Product, StoreSettings, CategoryType } from '../types';
 import {
   X, Lock, KeyRound, Plus, Trash2, Edit2, Check, RefreshCw,
-  Phone, Shield, Database, Sparkles, AlertCircle
+  Phone, Shield, Database, Sparkles, AlertCircle, Camera, Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import {
   addProduct,
@@ -45,16 +46,88 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const [newColors, setNewColors] = useState('Black, White');
   const [newDesc, setNewDesc] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const newFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Inline Price Edit State
-  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
-  const [editPriceVal, setEditPriceVal] = useState<string>('');
+  // Edit Product Modal / Form State
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editCategory, setEditCategory] = useState<CategoryType>('MEN');
+  const [editPrice, setEditPrice] = useState('');
+  const [editOriginalPrice, setEditOriginalPrice] = useState('');
+  const [editImageUrl, setEditImageUrl] = useState('');
+  const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Quick "Change Image" direct file input
+  const quickChangeInputRef = useRef<HTMLInputElement>(null);
+  const [quickChangeTargetId, setQuickChangeTargetId] = useState<string | null>(null);
 
   // Settings State
   const [waNumber, setWaNumber] = useState(settings.whatsappNumber || '96171554433');
   const [storeArea, setStoreArea] = useState(settings.area || 'Saaidnayel & Zahle area, Lebanon');
   const [newPin, setNewPin] = useState('');
   const [settingsSuccess, setSettingsSuccess] = useState('');
+
+  // Helper to convert file to Base64 Data URL
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // 1 & 2. Automatic Base64 Conversion for Add Product Image File Upload
+  const handleNewProductFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const base64 = await convertFileToBase64(file);
+      setNewImageUrl(base64);
+    } catch (err) {
+      console.error('Failed to convert image to Base64:', err);
+    }
+  };
+
+  // 1 & 2. Automatic Base64 Conversion for Edit Product Image File Upload
+  const handleEditProductFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const base64 = await convertFileToBase64(file);
+      setEditImageUrl(base64);
+    } catch (err) {
+      console.error('Failed to convert image to Base64:', err);
+    }
+  };
+
+  // 3. Direct "Change Image" Action for existing products
+  const triggerQuickChangeImage = (productId: string) => {
+    setQuickChangeTargetId(productId);
+    if (quickChangeInputRef.current) {
+      quickChangeInputRef.current.value = '';
+      quickChangeInputRef.current.click();
+    }
+  };
+
+  const handleQuickImageSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    const targetId = quickChangeTargetId;
+    if (!file || !targetId) return;
+
+    try {
+      const base64 = await convertFileToBase64(file);
+      await updateProduct(targetId, { image: base64 });
+      setQuickChangeTargetId(null);
+      if (quickChangeInputRef.current) {
+        quickChangeInputRef.current.value = '';
+      }
+      alert('Product image updated successfully from your device!');
+    } catch (err) {
+      console.error('Failed to update product image:', err);
+      alert('Error updating image.');
+    }
+  };
 
   // Verify PIN
   const handlePinSubmit = (e?: React.FormEvent) => {
@@ -79,7 +152,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           setIsAuthenticated(true);
           setPinError('');
         } else {
-          setPinError('Incorrect PIN. (Default: 1234)');
+          setPinError('Incorrect 4-digit PIN code. Please try again.');
           setPinInput('');
         }
       }
@@ -120,6 +193,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       setNewOriginalPrice('');
       setNewImageUrl('');
       setNewDesc('');
+      if (newFileInputRef.current) newFileInputRef.current.value = '';
       alert('Product created and broadcasted to catalog in real-time!');
     } catch (err) {
       console.error(err);
@@ -129,13 +203,38 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     }
   };
 
-  const handleSavePrice = async (prodId: string) => {
-    const val = parseFloat(editPriceVal);
-    if (!isNaN(val) && val > 0) {
-      await updateProductPrice(prodId, val);
-      setEditingPriceId(null);
-      setEditPriceVal('');
+  // Start editing a product
+  const startEditingProduct = (p: Product) => {
+    setEditingProductId(p.id);
+    setEditTitle(p.title);
+    setEditCategory(p.category);
+    setEditPrice(p.price.toString());
+    setEditOriginalPrice(p.originalPrice ? p.originalPrice.toString() : '');
+    setEditImageUrl(p.image);
+  };
+
+  // Save changes to edited product
+  const handleSaveProductEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProductId) return;
+
+    const priceNum = parseFloat(editPrice);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      alert('Please enter a valid price.');
+      return;
     }
+
+    const updates: Partial<Product> = {
+      title: editTitle.trim(),
+      category: editCategory,
+      price: priceNum,
+      originalPrice: editOriginalPrice ? parseFloat(editOriginalPrice) : undefined,
+      image: editImageUrl.trim() || undefined
+    };
+
+    await updateProduct(editingProductId, updates);
+    setEditingProductId(null);
+    alert('Product updated successfully!');
   };
 
   const handleDeleteProduct = async (id: string, title: string) => {
@@ -169,6 +268,15 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
+      {/* Hidden file input for direct "Change Image" button */}
+      <input
+        type="file"
+        ref={quickChangeInputRef}
+        accept="image/*"
+        className="hidden"
+        onChange={handleQuickImageSelected}
+      />
+
       <div
         className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
@@ -203,7 +311,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
             <h3 className="text-lg font-bold text-slate-900 mb-1">Store Owner Access</h3>
             <p className="text-xs text-slate-500 mb-5 max-w-xs">
-              Enter your 4-digit PIN code to manage products, pricing, and WhatsApp settings.
+              Enter 4-digit PIN code
             </p>
 
             {/* PIN Dots */}
@@ -249,10 +357,6 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                 </button>
               ))}
             </div>
-
-            <p className="text-[11px] text-slate-400 mt-2">
-              Default Store PIN: <strong className="text-slate-600">1234</strong>
-            </p>
           </div>
         ) : (
           /* Authenticated Admin Dashboard */
@@ -300,7 +404,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
                     <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
                       <Plus size={14} className="text-red-600" />
-                      Add New Product
+                      Add New Product to Catalog
                     </h4>
 
                     <form onSubmit={handleCreateProduct} className="space-y-3">
@@ -364,17 +468,55 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                         </div>
                       </div>
 
+                      {/* 1 & 2. FILE UPLOADER INPUT & AUTOMATIC BASE64 CONVERSION */}
+                      <div className="p-2.5 bg-white rounded-xl border border-slate-200 space-y-2">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-800 mb-1 flex items-center justify-between">
+                            <span className="flex items-center gap-1.5">
+                              <Upload size={13} className="text-red-600" />
+                              Upload Product Image from Device
+                            </span>
+                            <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+                              Base64 Automatic
+                            </span>
+                          </label>
+                          <input
+                            type="file"
+                            ref={newFileInputRef}
+                            accept="image/*"
+                            className="file-input block w-full text-xs text-slate-600 file:mr-2.5 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer"
+                            onChange={handleNewProductFileUpload}
+                          />
+                        </div>
+
+                        {/* Image Preview */}
+                        {newImageUrl && (
+                          <div className="flex items-center gap-2.5 p-2 bg-slate-50 rounded-lg border border-slate-100">
+                            <img
+                              src={newImageUrl}
+                              alt="New Product Preview"
+                              className="w-12 h-12 object-cover rounded-lg border border-slate-200 bg-white"
+                            />
+                            <div className="text-[10px] leading-tight">
+                              <span className="font-bold text-emerald-700 block">✓ Photo loaded & converted to Base64</span>
+                              <span className="text-slate-400">Ready to save with product catalog</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
                           <label className="block text-[11px] font-semibold text-slate-700 mb-1">
-                            Image URL / Preset
+                            Product Image URL / Data URL *
                           </label>
                           <input
                             type="text"
-                            placeholder="/images/men_organic_tee_... or https://"
+                            required
+                            placeholder="https://... or uploaded Base64"
                             value={newImageUrl}
                             onChange={(e) => setNewImageUrl(e.target.value)}
-                            className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"
+                            className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800 font-mono text-[11px]"
                           />
                         </div>
                         <div>
@@ -406,7 +548,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
                       {/* Quick Preset Images Selector */}
                       <div className="pt-1">
-                        <span className="text-[10px] text-slate-500 block mb-1">Quick Select Studio Photo:</span>
+                        <span className="text-[10px] text-slate-500 block mb-1">Or Quick Select Studio Photo:</span>
                         <div className="flex gap-2 overflow-x-auto pb-1">
                           {INITIAL_PRODUCTS.slice(0, 5).map((p) => (
                             <button
@@ -433,93 +575,198 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                     </form>
                   </div>
 
-                  {/* Existing Products List & Quick Price Edit */}
+                  {/* Existing Products List & Edit Capabilities */}
                   <div>
                     <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 mb-2">
                       Manage Catalog ({products.length} Items)
                     </h4>
-                    <div className="space-y-2">
-                      {products.map((p) => (
-                        <div
-                          key={p.id}
-                          className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors"
-                        >
-                          <img
-                            src={p.image}
-                            alt={p.title}
-                            referrerPolicy="no-referrer"
-                            className="w-12 h-12 object-cover rounded-lg border border-slate-100 bg-slate-50 shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold text-red-600 uppercase">
-                                {p.category}
-                              </span>
-                              <h5 className="text-xs font-bold text-slate-900 truncate">
-                                {p.title}
-                              </h5>
-                            </div>
+                    <div className="space-y-2.5">
+                      {products.map((p) => {
+                        const isEditing = editingProductId === p.id;
+                        if (isEditing) {
+                          return (
+                            <form
+                              key={p.id}
+                              onSubmit={handleSaveProductEdit}
+                              className="p-3.5 bg-white rounded-xl border-2 border-red-500 shadow-xs space-y-3 text-xs animate-in fade-in-50"
+                            >
+                              <div className="font-bold text-slate-900 flex justify-between items-center border-b border-slate-100 pb-2">
+                                <span className="flex items-center gap-1.5">
+                                  <Edit2 size={13} className="text-red-600" />
+                                  Editing: {p.title}
+                                </span>
+                                <span className="text-[10px] text-red-600 uppercase font-black tracking-wider">
+                                  EDIT MODE
+                                </span>
+                              </div>
 
-                            {/* Price or Edit Price */}
-                            <div className="flex items-center gap-2 mt-1">
-                              {editingPriceId === p.id ? (
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-xs font-bold text-slate-700">$</span>
+                              <div>
+                                <label className="block text-[10px] font-semibold text-slate-600 mb-1">
+                                  Product Title
+                                </label>
+                                <input
+                                  type="text"
+                                  value={editTitle}
+                                  onChange={(e) => setEditTitle(e.target.value)}
+                                  className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg font-medium"
+                                  required
+                                />
+                              </div>
+
+                              {/* 1 & 2. Upload from Device inside Edit Form */}
+                              <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                                <label className="block text-[10px] font-bold text-slate-800 flex items-center gap-1">
+                                  <Upload size={12} className="text-red-600" />
+                                  Upload Product Image from Device
+                                </label>
+                                <input
+                                  type="file"
+                                  ref={editFileInputRef}
+                                  accept="image/*"
+                                  className="file-input block w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer"
+                                  onChange={handleEditProductFileUpload}
+                                />
+                                {editImageUrl && (
+                                  <div className="flex items-center gap-2 pt-1">
+                                    <img
+                                      src={editImageUrl}
+                                      alt="Preview"
+                                      className="w-11 h-11 object-cover rounded-lg border border-slate-200 bg-white"
+                                    />
+                                    <span className="text-[10px] text-slate-500">
+                                      Selected image / preview
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div>
+                                <label className="block text-[10px] font-semibold text-slate-600 mb-1">
+                                  Image URL / Base64
+                                </label>
+                                <input
+                                  type="text"
+                                  value={editImageUrl}
+                                  onChange={(e) => setEditImageUrl(e.target.value)}
+                                  className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono text-[11px]"
+                                  required
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2.5">
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-slate-600 mb-1">
+                                    Category
+                                  </label>
+                                  <select
+                                    value={editCategory}
+                                    onChange={(e) => setEditCategory(e.target.value as CategoryType)}
+                                    className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold"
+                                  >
+                                    <option value="MEN">MEN</option>
+                                    <option value="WOMEN">WOMEN</option>
+                                    <option value="SALE">SALE</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-semibold text-slate-600 mb-1">
+                                    Price ($ USD)
+                                  </label>
                                   <input
                                     type="number"
                                     step="0.01"
-                                    value={editPriceVal}
-                                    onChange={(e) => setEditPriceVal(e.target.value)}
-                                    className="w-20 text-xs px-1.5 py-0.5 border border-slate-300 rounded font-bold"
-                                    autoFocus
+                                    value={editPrice}
+                                    onChange={(e) => setEditPrice(e.target.value)}
+                                    className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold"
+                                    required
                                   />
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSavePrice(p.id)}
-                                    className="p-1 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-                                    title="Save Price"
-                                  >
-                                    <Check size={12} />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => setEditingPriceId(null)}
-                                    className="p-1 bg-slate-200 text-slate-600 rounded hover:bg-slate-300"
-                                  >
-                                    <X size={12} />
-                                  </button>
                                 </div>
-                              ) : (
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-xs font-extrabold text-slate-900 tabular-nums">
-                                    ${p.price.toFixed(2)} USD
+                              </div>
+
+                              <div className="flex gap-2 pt-1">
+                                <button
+                                  type="submit"
+                                  className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold cursor-pointer transition-colors"
+                                >
+                                  Save Changes
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingProductId(null)}
+                                  className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-semibold cursor-pointer"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </form>
+                          );
+                        }
+
+                        return (
+                          <div
+                            key={p.id}
+                            className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-colors"
+                          >
+                            <img
+                              src={p.image}
+                              alt={p.title}
+                              referrerPolicy="no-referrer"
+                              className="w-12 h-12 object-cover rounded-lg border border-slate-100 bg-slate-50 shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-red-600 uppercase">
+                                  {p.category}
+                                </span>
+                                <h5 className="text-xs font-bold text-slate-900 truncate">
+                                  {p.title}
+                                </h5>
+                              </div>
+
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs font-extrabold text-slate-900 tabular-nums">
+                                  ${p.price.toFixed(2)} USD
+                                </span>
+                                {p.originalPrice && p.originalPrice > p.price && (
+                                  <span className="text-[10px] text-slate-400 line-through tabular-nums">
+                                    ${p.originalPrice.toFixed(2)}
                                   </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setEditingPriceId(p.id);
-                                      setEditPriceVal(p.price.toString());
-                                    }}
-                                    className="text-[10px] text-slate-500 hover:text-slate-900 flex items-center gap-0.5 underline cursor-pointer"
-                                  >
-                                    <Edit2 size={10} /> Edit Price
-                                  </button>
-                                </div>
-                              )}
+                                )}
+                              </div>
+                            </div>
+
+                            {/* 3. Action Buttons: Change Image, Edit, Delete */}
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => triggerQuickChangeImage(p.id)}
+                                className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-[10px] border border-emerald-200 flex items-center gap-1 cursor-pointer transition-colors"
+                                title="Upload new photo directly from your device"
+                              >
+                                <Camera size={12} />
+                                <span>Change Image</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => startEditingProduct(p)}
+                                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-[10px] cursor-pointer transition-colors"
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteProduct(p.id, p.title)}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                title="Delete Product"
+                              >
+                                <Trash2 size={14} />
+                              </button>
                             </div>
                           </div>
-
-                          {/* Delete Button */}
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteProduct(p.id, p.title)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Delete Product"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

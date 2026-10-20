@@ -118,7 +118,7 @@
 
       <!-- Right Action Icons: User / Staff Lock & Shopping Bag -->
       <div class="flex items-center gap-1 sm:gap-2">
-        <button id="adminTriggerBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 transition-colors" aria-label="Staff Login" title="Staff / Admin Access (PIN: 1234)">
+        <button id="adminTriggerBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 transition-colors" aria-label="Staff Login" title="Staff / Admin Access">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
         </button>
         <button id="cartTriggerBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 relative transition-colors" aria-label="Cart" title="Shopping Bag">
@@ -239,13 +239,16 @@
       </div>
 
       <button onclick="openPinModal()" class="text-[10px] text-slate-300 hover:text-slate-600 cursor-pointer">
-        Staff Console (PIN: 1234)
+        Staff Console
       </button>
     </div>
   </footer>
 
+  <!-- Hidden Quick Image Upload File Input for 1-Tap Photo Replacement -->
+  <input type="file" id="quickImageInput" accept="image/*" class="hidden" onchange="handleQuickImageChosen(event)">
+
   <!-- ======================================================== -->
-  <!-- MODALS: WhatsApp Order, Bag Drawer, Admin PIN, Info -->
+  <!-- MODALS: WhatsApp Order, Bag Drawer, Admin PIN, Edit Form -->
   <!-- ======================================================== -->
 
   <!-- WhatsApp Order Modal -->
@@ -319,7 +322,7 @@
     </div>
   </div>
 
-  <!-- Admin Modal with PIN Protection (Default: 1234) -->
+  <!-- Admin Modal with PIN Protection -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
       <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
@@ -330,19 +333,37 @@
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
         </button>
       </div>
+
+      <!-- PIN Verification Screen -->
       <div id="adminPinView" class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
         <h3 class="text-lg font-bold text-slate-900 mb-1">Store Owner Access</h3>
-        <p class="text-xs text-slate-500 mb-4">Enter 4-digit PIN code (Default: 1234):</p>
+        <p class="text-xs text-slate-500 mb-4">Enter 4-digit PIN code</p>
         <div class="flex justify-center gap-3 mb-4">
           <input id="adminPinInput" type="password" maxlength="4" placeholder="••••" class="w-32 text-center text-2xl tracking-widest font-mono py-1.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900">
         </div>
         <button onclick="verifyAdminPin()" class="px-6 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 cursor-pointer">
           Unlock Console
         </button>
-        <p id="adminPinError" class="text-xs text-red-600 font-semibold mt-2 hidden">Incorrect PIN. Try 1234.</p>
+        <p id="adminPinError" class="text-xs text-red-600 font-semibold mt-2 hidden">Incorrect PIN. Please try again.</p>
       </div>
+
+      <!-- Admin Dashboard Content -->
       <div id="adminDashboardView" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
-        <!-- WhatsApp Phone Setting -->
+        
+        <!-- Change PIN Functionality -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <h4 class="text-xs font-bold text-slate-900">Change Admin PIN</h4>
+          <p class="text-[11px] text-slate-500">Update the 4-digit security PIN for this boutique catalog.</p>
+          <div class="flex gap-2">
+            <input id="settingNewPin" type="password" maxlength="4" placeholder="New 4-Digit PIN" class="flex-1 text-xs p-2 bg-white border border-slate-200 rounded-lg font-mono tracking-widest text-center">
+            <button onclick="handleUpdatePinSubmit()" class="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shrink-0">
+              Update PIN
+            </button>
+          </div>
+          <p id="pinUpdateSuccessMsg" class="text-[11px] text-emerald-600 font-bold hidden">PIN successfully updated!</p>
+        </div>
+
+        <!-- Store WhatsApp Phone Setting -->
         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
           <h4 class="text-xs font-bold text-slate-900">Store WhatsApp Phone Number</h4>
           <input id="settingWaNumber" type="text" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-mono">
@@ -350,29 +371,79 @@
             Save WhatsApp Number
           </button>
         </div>
-        <!-- Add Product Form -->
-        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+
+        <!-- ADD PRODUCT TO CATALOG: Direct File Upload & URL -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
           <h4 class="text-xs font-bold text-slate-900">Add Product to Catalog</h4>
-          <input id="newProdTitle" type="text" placeholder="Title (e.g. Summer Polo Shirt)" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
-          <div class="grid grid-cols-2 gap-2">
-            <select id="newProdCategory" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
-              <option value="MEN">MEN</option>
-              <option value="WOMEN">WOMEN</option>
-              <option value="SALE">SALE</option>
-            </select>
-            <input id="newProdPrice" type="number" step="0.01" placeholder="Price in USD ($)" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
+          
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Product Title *</label>
+            <input id="newProdTitle" type="text" required placeholder="Title (e.g. Summer Resort Polo)" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
           </div>
-          <button onclick="handleAddProductSubmit()" class="w-full py-2 bg-slate-900 text-white text-xs font-bold rounded-lg cursor-pointer">
+
+          <!-- 1 & 2. FILE UPLOADER INPUT & AUTOMATIC BASE64 CONVERSION -->
+          <div class="p-2.5 bg-white rounded-lg border border-slate-200 space-y-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-800 mb-1 flex items-center justify-between">
+                <span>Upload Product Image from Device</span>
+                <span class="text-[10px] text-emerald-600 font-semibold">Base64 Automatic</span>
+              </label>
+              <input type="file" id="newProdFileInput" accept="image/*" class="file-input block w-full text-xs text-slate-600 file:mr-2.5 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer" onchange="handleNewProductFileUpload(event)">
+            </div>
+            
+            <!-- Live Upload Preview -->
+            <div id="newProdPreviewContainer" class="hidden flex items-center gap-2.5 p-1.5 bg-slate-50 rounded-md border border-slate-100">
+              <img id="newProdImagePreview" src="" alt="Preview" class="w-12 h-12 object-cover rounded-md border border-slate-200 bg-white">
+              <div class="text-[10px] leading-tight">
+                <span class="font-bold text-emerald-700 block">✓ Photo loaded & converted to Base64</span>
+                <span class="text-slate-400">Ready to save with product</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Image URL Field -->
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Product Image URL / Data URL *</label>
+            <input id="newProdImageUrl" type="text" required placeholder="https://... or auto-filled from upload" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-mono text-[11px]">
+            <!-- Quick Preset Gallery Helper -->
+            <div class="pt-1 flex items-center gap-1.5 overflow-x-auto pb-1">
+              <span class="text-[10px] text-slate-400 shrink-0">Presets:</span>
+              <button type="button" onclick="setPresetImageUrl('/images/men_organic_tee_1792500656215.jpg')" class="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 hover:border-slate-800 cursor-pointer">Men Tee</button>
+              <button type="button" onclick="setPresetImageUrl('/images/women_slim_jeans_1792500657768.jpg')" class="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 hover:border-slate-800 cursor-pointer">Jeans</button>
+              <button type="button" onclick="setPresetImageUrl('/images/men_city_blazer_1792500658141.jpg')" class="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 hover:border-slate-800 cursor-pointer">Blazer</button>
+              <button type="button" onclick="setPresetImageUrl('/images/women_linen_midi_dress_1792500659025.jpg')" class="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 hover:border-slate-800 cursor-pointer">Dress</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Category *</label>
+              <select id="newProdCategory" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-bold">
+                <option value="MEN">MEN</option>
+                <option value="WOMEN">WOMEN</option>
+                <option value="SALE">SALE</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-1">Price in USD ($) *</label>
+              <input id="newProdPrice" type="number" step="0.01" required placeholder="39.99" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
+            </div>
+          </div>
+
+          <button onclick="handleAddProductSubmit()" class="w-full py-2 bg-slate-900 text-white text-xs font-bold rounded-lg cursor-pointer hover:bg-slate-800">
             Publish Product
           </button>
         </div>
-        <!-- Manage Catalog -->
+
+        <!-- 3. MANAGE & EDIT CATALOG PRODUCTS: Includes Direct "Change Image" Button -->
         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
           <div class="flex items-center justify-between">
             <h4 class="text-xs font-bold text-slate-900">Manage Catalog Products</h4>
             <button onclick="restoreInitialCatalog()" class="text-[10px] text-red-600 font-bold underline cursor-pointer">Reset Catalog</button>
           </div>
-          <div id="adminProductList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+          <!-- Hidden file input for direct "Change Image" button -->
+          <input type="file" id="quickChangeImageFileInput" accept="image/*" class="hidden" onchange="handleQuickChangeImage(event)">
+          <div id="adminProductList" class="space-y-2.5 max-h-72 overflow-y-auto"></div>
         </div>
       </div>
     </div>
@@ -523,11 +594,20 @@
     // Global Store State
     window.currentCategory = 'MEN';
     window.whatsappNumber = '96171554433'; // Saaidnayel & Zahle phone
-    window.adminPin = '1234';
+    window.adminPin = localStorage.getItem('hamdar_admin_pin') || '1234';
     window.products = [...SEED_PRODUCTS];
     window.cart = [];
     window.activeOrderProduct = null;
     window.activeSelectedSize = 'M';
+    window.editingProductId = null;
+    window.quickUploadTargetProdId = null;
+
+    // Firebase instances stored globally for write access
+    window.firebaseApp = null;
+    window.firebaseDb = null;
+    window.firebaseRef = null;
+    window.firebaseSet = null;
+    window.firebaseUpdate = null;
 
     // 2. SAFE FALLBACK & HYBRID DATA INITIALIZATION
     // Immediately render default catalog so the website UI works flawlessly instantly without breaking
@@ -537,12 +617,17 @@
     (async function initFirebaseBackend() {
       try {
         const { initializeApp, getApps } = await import(/* @vite-ignore */ "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-        const { getDatabase, ref, onValue, goOffline } = await import(/* @vite-ignore */ "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+        const { getDatabase, ref, onValue, set, update, goOffline } = await import(/* @vite-ignore */ "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
 
         let app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
         // Pass the explicit database instance URL
         const db = getDatabase(app, "https://hamdar-fashion-wear-default-rtdb.firebaseio.com");
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+        window.firebaseRef = ref;
+        window.firebaseSet = set;
+        window.firebaseUpdate = update;
 
         // If it's the unconfigured placeholder credentials, go offline immediately to prevent socket errors
         if (firebaseConfig.apiKey.includes('PLACEHOLDER')) {
@@ -564,21 +649,23 @@
                 renderProductGrid();
               }
             }
-          }, (err) => {
-            // Graceful silent fallback to local array
-          });
-        } catch (e) {
-          // Keep local array active
-        }
+          }, () => {});
+        } catch (e) {}
 
         try {
           const settingsRef = ref(db, 'settings');
           onValue(settingsRef, (snapshot) => {
             const s = snapshot.val();
-            if (s && s.whatsappNumber) {
-              window.whatsappNumber = s.whatsappNumber;
-              const input = document.getElementById('settingWaNumber');
-              if (input) input.value = s.whatsappNumber;
+            if (s) {
+              if (s.whatsappNumber) {
+                window.whatsappNumber = s.whatsappNumber;
+                const input = document.getElementById('settingWaNumber');
+                if (input) input.value = s.whatsappNumber;
+              }
+              if (s.pin) {
+                window.adminPin = s.pin;
+                localStorage.setItem('hamdar_admin_pin', s.pin);
+              }
             }
           }, () => {});
         } catch (e) {}
@@ -589,7 +676,130 @@
     })();
 
     // ==========================================
-    // UI RENDERING & INTERACTION FUNCTIONS
+    // BASE64 FILE READER & OPTIMIZATION HELPER
+    // ==========================================
+    window.readFileAsBase64 = function(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return reject(new Error('No file provided'));
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          // Scale through canvas for crisp display while keeping payload snappy
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const maxDim = 800; // Optimal mobile resolution
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const optimized = canvas.toDataURL('image/jpeg', 0.84);
+            resolve(optimized);
+          };
+          img.onerror = () => resolve(dataUrl);
+          img.src = dataUrl;
+        };
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+    };
+
+    // 2. AUTOMATIC BASE64 CONVERSION FOR "Add Product"
+    window.handleNewProductFileUpload = async function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const base64Url = await window.readFileAsBase64(file);
+        document.getElementById('newProdImageUrl').value = base64Url;
+
+        // Show Image Preview
+        const previewImg = document.getElementById('newProdImagePreview');
+        const container = document.getElementById('newProdPreviewContainer');
+        if (previewImg && container) {
+          previewImg.src = base64Url;
+          container.classList.remove('hidden');
+        }
+      } catch (err) {
+        alert('Could not process the selected image. Please try another file.');
+      }
+    };
+
+    // 2. AUTOMATIC BASE64 CONVERSION FOR "Edit Product" Form
+    window.handleEditProductFileUpload = async function(event, prodId) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const base64Url = await window.readFileAsBase64(file);
+        const urlInput = document.getElementById(`editImage_${prodId}`);
+        const previewImg = document.getElementById(`editImagePreview_${prodId}`);
+        if (urlInput) urlInput.value = base64Url;
+        if (previewImg) previewImg.src = base64Url;
+      } catch (err) {
+        alert('Could not process the selected image.');
+      }
+    };
+
+    // 3. EASY IMAGE REPLACEMENT FOR EXISTING PRODUCTS (1-Tap from Device)
+    window.triggerQuickImageUpload = function(prodId) {
+      window.quickUploadTargetProdId = prodId;
+      const fileInput = document.getElementById('quickImageInput');
+      if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+      }
+    };
+
+    window.handleQuickImageChosen = async function(event) {
+      const file = event.target.files?.[0];
+      const prodId = window.quickUploadTargetProdId;
+      if (!file || !prodId) return;
+
+      try {
+        const base64Url = await window.readFileAsBase64(file);
+
+        // Update in memory
+        const prod = window.products.find(p => p.id === prodId);
+        if (prod) {
+          prod.image = base64Url;
+        }
+
+        // Render both storefront and admin list
+        renderProductGrid();
+        renderAdminProductList();
+
+        // Update in Firebase Realtime Database
+        if (window.firebaseDb && window.firebaseRef && window.firebaseUpdate) {
+          try {
+            const pRef = window.firebaseRef(window.firebaseDb, `products/${prodId}`);
+            await window.firebaseUpdate(pRef, { image: base64Url });
+          } catch (e) {
+            console.info('Cloud sync note:', e);
+          }
+        }
+
+        alert(`Photo for "${prod ? prod.title : 'item'}" updated successfully!`);
+      } catch (err) {
+        alert('Error uploading new image. Please try again.');
+      } finally {
+        window.quickUploadTargetProdId = null;
+      }
+    };
+
+    // ==========================================
+    // UI RENDERING & STOREFRONT INTERACTION
     // ==========================================
 
     function renderProductGrid() {
@@ -927,7 +1137,10 @@
       window.open(url, '_blank');
     };
 
-    // Admin Panel Logic (Default PIN: 1234)
+    // ==========================================
+    // ADMIN PANEL & PIN LOGIC
+    // ==========================================
+
     document.getElementById('adminTriggerBtn').onclick = () => {
       openPinModal();
     };
@@ -945,8 +1158,9 @@
     };
 
     window.verifyAdminPin = function() {
-      const entered = document.getElementById('adminPinInput').value;
-      if (entered === window.adminPin || entered === '1234') {
+      const entered = document.getElementById('adminPinInput').value.trim();
+      const currentPin = window.adminPin || '1234';
+      if (entered === currentPin) {
         document.getElementById('adminPinView').classList.add('hidden');
         document.getElementById('adminDashboardView').classList.remove('hidden');
         document.getElementById('settingWaNumber').value = window.whatsappNumber;
@@ -956,21 +1170,143 @@
       }
     };
 
-    window.saveWhatsAppSetting = function() {
+    // Change Admin PIN
+    window.handleUpdatePinSubmit = async function() {
+      const newPin = document.getElementById('settingNewPin').value.trim();
+      if (newPin.length !== 4 || isNaN(parseInt(newPin, 10))) {
+        alert('Please enter a valid 4-digit numeric PIN.');
+        return;
+      }
+
+      window.adminPin = newPin;
+      localStorage.setItem('hamdar_admin_pin', newPin);
+
+      // Update in Firebase Realtime Database under /settings/pin
+      if (window.firebaseDb && window.firebaseRef && window.firebaseSet) {
+        try {
+          const pinRef = window.firebaseRef(window.firebaseDb, 'settings/pin');
+          await window.firebaseSet(pinRef, newPin);
+        } catch (e) {
+          console.info('Local PIN updated, cloud notice:', e);
+        }
+      }
+
+      const msg = document.getElementById('pinUpdateSuccessMsg');
+      if (msg) {
+        msg.classList.remove('hidden');
+        setTimeout(() => msg.classList.add('hidden'), 3500);
+      }
+      document.getElementById('settingNewPin').value = '';
+      alert('Admin PIN successfully updated!');
+    };
+
+    window.saveWhatsAppSetting = async function() {
       const val = document.getElementById('settingWaNumber').value.replace(/\D/g, '');
       if (val) {
         window.whatsappNumber = val;
+        if (window.firebaseDb && window.firebaseRef && window.firebaseSet) {
+          try {
+            const waRef = window.firebaseRef(window.firebaseDb, 'settings/whatsappNumber');
+            await window.firebaseSet(waRef, val);
+          } catch (e) {}
+        }
         alert('WhatsApp phone updated to: +' + val);
       }
     };
 
-    window.handleAddProductSubmit = function() {
+    // Helper to quickly fill preset image in Add Product form
+    window.setPresetImageUrl = function(url) {
+      document.getElementById('newProdImageUrl').value = url;
+      const previewImg = document.getElementById('newProdImagePreview');
+      const container = document.getElementById('newProdPreviewContainer');
+      if (previewImg && container) {
+        previewImg.src = url;
+        container.classList.remove('hidden');
+      }
+    };
+
+    // 1 & 2. Automatic Base64 Conversion for Add Product Image File Upload
+    window.handleNewProductFileUpload = function(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        document.getElementById('newProdImageUrl').value = base64;
+        const preview = document.getElementById('newProdImagePreview');
+        const container = document.getElementById('newProdPreviewContainer');
+        if (preview && container) {
+          preview.src = base64;
+          container.classList.remove('hidden');
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // 1 & 2. Automatic Base64 Conversion for Edit Product Image File Upload
+    window.handleEditProductFileUpload = function(event, prodId) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        const input = document.getElementById(`editImage_${prodId}`);
+        if (input) input.value = base64;
+        const preview = document.getElementById(`editImagePreview_${prodId}`);
+        if (preview) preview.src = base64;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // 3. Direct "Change Image" Button Logic
+    window.quickChangeProductId = null;
+    window.triggerQuickImageUpload = function(prodId) {
+      window.quickChangeProductId = prodId;
+      const fileInput = document.getElementById('quickChangeImageFileInput');
+      if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+      }
+    };
+
+    window.handleQuickChangeImage = async function(event) {
+      const file = event.target.files && event.target.files[0];
+      const prodId = window.quickChangeProductId;
+      if (!file || !prodId) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const base64 = e.target.result;
+        const prod = window.products.find(p => p.id === prodId);
+        if (prod) {
+          prod.image = base64;
+        }
+        renderProductGrid();
+        renderAdminProductList();
+
+        // Update image in Firebase Realtime Database instantly
+        if (window.firebaseDb && window.firebaseRef && window.firebaseUpdate) {
+          try {
+            const pRef = window.firebaseRef(window.firebaseDb, `products/${prodId}`);
+            await window.firebaseUpdate(pRef, { image: base64 });
+          } catch (err) {
+            console.info('Updated image locally:', err);
+          }
+        }
+        alert('Product image updated successfully from your device!');
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // Add Product to Catalog
+    window.handleAddProductSubmit = async function() {
       const title = document.getElementById('newProdTitle').value.trim();
+      const imageUrl = document.getElementById('newProdImageUrl').value.trim();
       const cat = document.getElementById('newProdCategory').value;
       const price = parseFloat(document.getElementById('newProdPrice').value);
 
-      if (!title || isNaN(price)) {
-        alert('Please provide title and price.');
+      if (!title || !imageUrl || isNaN(price) || price <= 0) {
+        alert('Please provide Title, valid Image URL, and Price.');
         return;
       }
 
@@ -979,8 +1315,8 @@
         title,
         category: cat,
         price,
-        image: cat === 'WOMEN' ? '/images/women_linen_midi_dress_1792500659025.jpg' : '/images/men_organic_tee_1792500656215.jpg',
-        sizes: ['M', 'L'],
+        image: imageUrl,
+        sizes: ['S', 'M', 'L', 'XL'],
         inStock: true
       };
 
@@ -988,32 +1324,170 @@
       renderProductGrid();
       renderAdminProductList();
 
+      // Write to Firebase if connected
+      if (window.firebaseDb && window.firebaseRef && window.firebaseSet) {
+        try {
+          const pRef = window.firebaseRef(window.firebaseDb, `products/${newProd.id}`);
+          await window.firebaseSet(pRef, newProd);
+        } catch (e) {}
+      }
+
       document.getElementById('newProdTitle').value = '';
+      document.getElementById('newProdImageUrl').value = '';
       document.getElementById('newProdPrice').value = '';
+      document.getElementById('newProdFileInput').value = '';
+      document.getElementById('newProdPreviewContainer')?.classList.add('hidden');
       alert('Product published to catalog!');
     };
 
+    // Manage Catalog Products with Direct Image Uploader and Edit Mode
     function renderAdminProductList() {
       const list = document.getElementById('adminProductList');
-      list.innerHTML = window.products.map(p => `
-        <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs">
-          <div class="flex items-center gap-2 truncate">
-            <span class="font-bold text-red-600 uppercase text-[10px]">${p.category}</span>
-            <span class="font-semibold text-slate-800 truncate">${p.title}</span>
+      if (!list) return;
+
+      list.innerHTML = window.products.map(p => {
+        const isEditing = window.editingProductId === p.id;
+        if (isEditing) {
+          return `
+            <div class="p-3 bg-white rounded-xl border-2 border-red-500 shadow-sm space-y-2.5 text-xs">
+              <div class="font-bold text-slate-900 flex justify-between items-center border-b border-slate-100 pb-1.5">
+                <span>Editing: ${p.title}</span>
+                <span class="text-[10px] text-red-600 uppercase font-black tracking-wider">EDIT MODE</span>
+              </div>
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-600 mb-0.5">Product Title</label>
+                <input id="editTitle_${p.id}" type="text" value="${p.title}" class="w-full text-xs p-1.5 border border-slate-300 rounded font-medium">
+              </div>
+
+              <!-- 1 & 2. Upload from Device inside Edit Form -->
+              <div class="p-2 bg-slate-50 rounded-lg border border-slate-200 space-y-1.5">
+                <label class="block text-[10px] font-bold text-slate-800">Upload Product Image from Device</label>
+                <input type="file" accept="image/*" class="file-input block w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer" onchange="handleEditProductFileUpload(event, '${p.id}')">
+                <div class="flex items-center gap-2 pt-1">
+                  <img id="editImagePreview_${p.id}" src="${p.image}" alt="Preview" class="w-10 h-10 object-cover rounded-md border border-slate-200 bg-white">
+                  <span class="text-[10px] text-slate-500">Preview / Selected photo</span>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-600 mb-0.5">Image URL</label>
+                <input id="editImage_${p.id}" type="text" value="${p.image}" class="w-full text-xs p-1.5 border border-slate-300 rounded font-mono text-[11px]">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-600 mb-0.5">Category</label>
+                  <select id="editCategory_${p.id}" class="w-full text-xs p-1.5 border border-slate-300 rounded font-bold">
+                    <option value="MEN" ${p.category === 'MEN' ? 'selected' : ''}>MEN</option>
+                    <option value="WOMEN" ${p.category === 'WOMEN' ? 'selected' : ''}>WOMEN</option>
+                    <option value="SALE" ${p.category === 'SALE' ? 'selected' : ''}>SALE</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-semibold text-slate-600 mb-0.5">Price ($ USD)</label>
+                  <input id="editPrice_${p.id}" type="number" step="0.01" value="${p.price}" class="w-full text-xs p-1.5 border border-slate-300 rounded font-bold">
+                </div>
+              </div>
+              <div class="flex gap-2 pt-1">
+                <button onclick="saveProductEdit('${p.id}')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold cursor-pointer transition-colors">
+                  Save Changes
+                </button>
+                <button onclick="cancelProductEdit()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded font-semibold cursor-pointer">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 text-xs transition-colors gap-2">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <img src="${p.image}" alt="${p.title}" class="w-11 h-11 object-cover rounded-lg border border-slate-100 shrink-0 bg-slate-50">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-red-600 uppercase text-[9px]">${p.category}</span>
+                  <span class="font-bold text-slate-900 truncate block">${p.title}</span>
+                </div>
+                <span class="text-xs font-extrabold text-slate-950 tabular-nums">$${p.price.toFixed(2)} USD</span>
+              </div>
+            </div>
+
+            <!-- 3. Direct "Change Image", Edit, and Delete Actions -->
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="triggerQuickImageUpload('${p.id}')" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg text-[10px] border border-emerald-200 flex items-center gap-1 cursor-pointer transition-colors" title="Upload new photo directly from your device">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"/></svg>
+                <span>Change Image</span>
+              </button>
+
+              <button onclick="startProductEdit('${p.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-[10px] cursor-pointer transition-colors">
+                Edit
+              </button>
+              
+              <button onclick="deleteProduct('${p.id}')" class="p-1 text-slate-400 hover:text-red-600 font-bold" title="Delete">
+                ✕
+              </button>
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="font-extrabold text-slate-900">$${p.price.toFixed(2)}</span>
-            <button onclick="deleteProduct('${p.id}')" class="text-slate-400 hover:text-red-600 font-bold p-1">✕</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    window.deleteProduct = function(id) {
+    window.startProductEdit = function(id) {
+      window.editingProductId = id;
+      renderAdminProductList();
+    };
+
+    window.cancelProductEdit = function() {
+      window.editingProductId = null;
+      renderAdminProductList();
+    };
+
+    window.saveProductEdit = async function(id) {
+      const title = document.getElementById(`editTitle_${id}`).value.trim();
+      const imageUrl = document.getElementById(`editImage_${id}`).value.trim();
+      const cat = document.getElementById(`editCategory_${id}`).value;
+      const price = parseFloat(document.getElementById(`editPrice_${id}`).value);
+
+      if (!title || !imageUrl || isNaN(price) || price <= 0) {
+        alert('Please fill out all fields with valid information.');
+        return;
+      }
+
+      const prod = window.products.find(p => p.id === id);
+      if (prod) {
+        prod.title = title;
+        prod.image = imageUrl;
+        prod.category = cat;
+        prod.price = price;
+      }
+
+      window.editingProductId = null;
+      renderProductGrid();
+      renderAdminProductList();
+
+      // Update in Firebase Realtime Database
+      if (window.firebaseDb && window.firebaseRef && window.firebaseUpdate) {
+        try {
+          const pRef = window.firebaseRef(window.firebaseDb, `products/${id}`);
+          await window.firebaseUpdate(pRef, { title, image: imageUrl, category: cat, price });
+        } catch (e) {}
+      }
+
+      alert('Product updated successfully!');
+    };
+
+    window.deleteProduct = async function(id) {
       if (confirm('Delete this product from catalog?')) {
         window.products = window.products.filter(p => p.id !== id);
         renderProductGrid();
         renderAdminProductList();
+
+        if (window.firebaseDb && window.firebaseRef && window.firebaseSet) {
+          try {
+            const pRef = window.firebaseRef(window.firebaseDb, `products/${id}`);
+            await window.firebaseSet(pRef, null);
+          } catch (e) {}
+        }
       }
     };
 
