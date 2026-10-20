@@ -1,55 +1,410 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>HAMDAR Fashion Wear - Saaidnayel & Zahle</title>
-    <meta name="description" content="HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon." />
-    <meta property="og:title" content="HAMDAR Fashion Wear - Saaidnayel & Zahle" />
-    <meta property="og:description" content="HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Outfit:wght@400;500;600;700;800;900&family=Playball&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-      html, body {
-        overflow-x: hidden;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-y;
-      }
-      textarea, input {
-        overflow-y: auto !important;
-        touch-action: pan-y !important;
-        user-select: text !important;
-      }
-    </style>
-    <script>
-      // Clean console warning filter for placeholder Firebase RTDB URL
-      (function() {
-        const origWarn = console.warn;
-        console.warn = function(...args) {
-          if (args[0] && typeof args[0] === 'string' && args[0].includes('FIREBASE WARNING') && args[0].includes('Please ensure that you have the URL')) {
-            return;
-          }
-          origWarn.apply(console, args);
-        };
-      })();
-    </script>
-  </head>
-  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-red-500 selection:text-white">
-    <div id="root"></div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HAMDAR Fashion Wear - Saaidnayel & Zahle</title>
+  <meta name="description" content="HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon.">
+  <meta property="og:title" content="HAMDAR Fashion Wear - Saaidnayel & Zahle">
+  <meta property="og:description" content="HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
 
-    <!-- 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Outfit, Plus Jakarta Sans, Playball, Alex Brush -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Outfit:wght@400;500;600;700;800;900&family=Playball&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Strictly enforce mobile smooth vertical scrolling without horizontal panning */
+    html, body {
+      overflow-x: hidden;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    textarea, input, select {
+      overflow-y: auto !important;
+      touch-action: pan-y !important;
+      user-select: text !important;
+    }
+    .font-outfit { font-family: 'Outfit', sans-serif; }
+    .font-script { font-family: 'Playball', 'Alex Brush', cursive; }
+  </style>
+
+  <!-- Clean Console Warning Filter for Unprovisioned Placeholder Firebase RTDB URL -->
+  <script>
+    (function() {
+      const origWarn = console.warn;
+      console.warn = function(...args) {
+        if (
+          args[0] &&
+          typeof args[0] === 'string' &&
+          args[0].includes('FIREBASE WARNING') &&
+          args[0].includes('Please ensure that you have the URL')
+        ) {
+          // Suppress unconfigured placeholder warning
+          return;
+        }
+        origWarn.apply(console, args);
+      };
+    })();
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-red-500 selection:text-white">
+
+  <!-- Top Location & Delivery Bar -->
+  <div class="bg-slate-900 text-white text-[11px] py-1.5 px-3 text-center tracking-wide font-medium flex items-center justify-center gap-1.5">
+    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+    <span>HAMDAR Fashion Wear · Serving Saaidnayel, Zahle & Bekaa Valley, Lebanon</span>
+  </div>
+
+  <!-- Sticky Header -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs">
+    <div class="max-w-md mx-auto sm:max-w-xl md:max-w-4xl px-4 py-3 flex items-center justify-between">
+      
+      <!-- Search Button (Left) -->
+      <div class="flex items-center gap-2">
+        <button id="searchToggleBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 transition-colors" aria-label="Search">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+        </button>
+      </div>
+
+      <!-- Centered Official Brand Logo Lockup (Rapid Triple Tap Trigger for Admin) -->
+      <div id="headerLogo" class="flex items-center gap-2 cursor-pointer select-none active:scale-98 transition-transform" title="HAMDAR Fashion Wear">
+        <!-- Left Red Geometric Faceted Ribbon Emblem -->
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none" class="shrink-0">
+          <path d="M18 14 L36 14 L36 46 L18 64 Z" fill="#DC2626"/>
+          <path d="M18 64 L36 46 L36 86 L18 86 Z" fill="#991B1B"/>
+          <path d="M36 34 L64 52 L64 68 L36 50 Z" fill="#EF4444"/>
+          <path d="M64 14 L82 14 L82 64 L64 46 Z" fill="#EF4444"/>
+          <path d="M64 46 L82 64 L82 86 L64 86 Z" fill="#B91C1C"/>
+        </svg>
+
+        <!-- Brand Text Lockup -->
+        <div class="flex flex-col items-center justify-center leading-none">
+          <div class="flex items-center tracking-tight font-black font-outfit text-slate-950 text-xl sm:text-2xl leading-none">
+            <span>H</span>
+            <span class="relative inline-block mx-[0.5px]">
+              <span>A</span>
+              <span class="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[5px] border-t-red-600"></span>
+            </span>
+            <span>M</span>
+            <span>D</span>
+            <span class="relative inline-block mx-[0.5px]">
+              <span>A</span>
+              <span class="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[5px] border-t-red-600"></span>
+            </span>
+            <span>R</span>
+          </div>
+          <span class="font-script text-[#B91C1C] text-xs sm:text-sm font-normal tracking-wide -mt-0.5 italic">Fashion Wear</span>
+        </div>
+
+        <!-- Right Red Geometric Faceted Ribbon Emblem -->
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none" class="shrink-0">
+          <path d="M18 14 L36 14 L36 46 L18 64 Z" fill="#DC2626"/>
+          <path d="M18 64 L36 46 L36 86 L18 86 Z" fill="#991B1B"/>
+          <path d="M36 34 L64 52 L64 68 L36 50 Z" fill="#EF4444"/>
+          <path d="M64 14 L82 14 L82 64 L64 46 Z" fill="#EF4444"/>
+          <path d="M64 46 L82 64 L82 86 L64 86 Z" fill="#B91C1C"/>
+        </svg>
+      </div>
+
+      <!-- Right Action Icons: User / Staff Lock & Shopping Bag -->
+      <div class="flex items-center gap-1 sm:gap-2">
+        <button id="adminTriggerBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 transition-colors" aria-label="Staff Login" title="Staff / Admin Access (PIN: 1234)">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+        </button>
+        <button id="cartTriggerBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 relative transition-colors" aria-label="Cart" title="Shopping Bag">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>
+          <span id="cartCountBadge" class="hidden absolute top-1 right-1 w-4 h-4 bg-red-600 text-white text-[10px] font-black rounded-full items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Expandable Search Bar -->
+    <div id="searchContainer" class="hidden max-w-md mx-auto sm:max-w-xl md:max-w-4xl px-4 pb-3">
+      <div class="relative">
+        <input id="searchInput" type="text" placeholder="Search tees, jeans, blazers, dresses..." class="w-full text-xs sm:text-sm pl-9 pr-8 py-2 bg-slate-100 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-slate-900">
+        <svg class="absolute left-3 top-2.5 text-slate-400" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+        <button id="clearSearchBtn" class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Navigation Bar (MEN, WOMEN, SALE) -->
+    <nav class="max-w-md mx-auto sm:max-w-xl md:max-w-4xl px-4 pb-2 border-t border-slate-100 pt-2 flex items-center justify-around font-outfit font-bold text-sm">
+      <button onclick="setCategory('MEN')" id="tabMEN" class="py-1 px-6 text-slate-950 font-black border-b-2 border-slate-950 tracking-widest cursor-pointer">MEN</button>
+      <button onclick="setCategory('WOMEN')" id="tabWOMEN" class="py-1 px-6 text-slate-400 hover:text-slate-700 tracking-widest cursor-pointer">WOMEN</button>
+      <button onclick="setCategory('SALE')" id="tabSALE" class="py-1 px-6 text-slate-400 hover:text-slate-700 tracking-widest cursor-pointer">SALE</button>
+    </nav>
+  </header>
+
+  <!-- Main Storefront Content -->
+  <main class="max-w-md mx-auto sm:max-w-xl md:max-w-4xl w-full px-3 sm:px-4 py-4 space-y-6">
+    <!-- Active Category Header -->
+    <div class="flex items-center justify-between px-1">
+      <div>
+        <span id="categoryKicker" class="text-[11px] font-bold tracking-widest uppercase text-red-600">Collection</span>
+        <h2 id="categoryTitle" class="text-xl sm:text-2xl font-black text-slate-950 font-outfit">Men's Modern Collection</h2>
+      </div>
+      <span id="productCount" class="text-xs text-slate-400 font-medium tabular-nums">4 items</span>
+    </div>
+
+    <!-- 2-Column Product Grid (Matching Reference Screenshot) -->
+    <div id="productGrid" class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+      <!-- Dynamically Rendered by Script with Zero Delay -->
+    </div>
+
+    <!-- Showcase Banner: "HAMDAR New Arrivals" (Exact Reference Banner) -->
+    <section class="relative rounded-2xl overflow-hidden shadow-sm border border-slate-200 mt-8 cursor-pointer" onclick="setCategory('SALE'); window.scrollTo({top: 0, behavior: 'smooth'});">
+      <div class="relative aspect-16/9 w-full bg-slate-900 overflow-hidden">
+        <img src="/images/banner_new_arrivals_1792500659523.jpg" alt="HAMDAR New Arrivals" class="w-full h-full object-cover opacity-90">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+          <div class="bg-white/95 px-6 sm:px-8 py-3 rounded-2xl shadow-xl flex flex-col items-center justify-center hover:scale-105 transition-transform">
+            <span class="font-outfit font-black text-slate-950 text-base sm:text-xl leading-none">HAMDAR</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-700 tracking-wide mt-0.5">New Arrivals</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust & Service Notice for Saaidnayel & Zahle -->
+    <div class="bg-slate-100 rounded-2xl p-4 sm:p-5 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-slate-900">Local Boutique Service in Saaidnayel & Zahle</h4>
+          <p class="text-[11px] text-slate-500">Try at home before payment · Express delivery across Bekaa & all Lebanon</p>
+        </div>
+      </div>
+      <button onclick="openInfoModal('shipping')" class="px-3.5 py-1.5 bg-white border border-slate-300 text-slate-800 text-xs font-bold rounded-lg hover:bg-slate-50 transition-colors shrink-0 cursor-pointer">
+        Delivery Details
+      </button>
+    </div>
+  </main>
+
+  <!-- Minimal Footer (STRICTLY NO PAYMENT ICONS) -->
+  <footer class="mt-12 bg-white border-t border-slate-200 pt-8 pb-10 text-center">
+    <div class="max-w-md mx-auto sm:max-w-xl md:max-w-4xl px-4 flex flex-col items-center text-center space-y-5">
+      <div class="flex items-center gap-2">
+        <svg width="24" height="24" viewBox="0 0 100 100" fill="none" class="shrink-0">
+          <path d="M18 14 L36 14 L36 46 L18 64 Z" fill="#DC2626"/>
+          <path d="M18 64 L36 46 L36 86 L18 86 Z" fill="#991B1B"/>
+          <path d="M36 34 L64 52 L64 68 L36 50 Z" fill="#EF4444"/>
+          <path d="M64 14 L82 14 L82 64 L64 46 Z" fill="#EF4444"/>
+          <path d="M64 46 L82 64 L82 86 L64 86 Z" fill="#B91C1C"/>
+        </svg>
+        <span class="font-outfit font-black tracking-tight text-slate-900 text-sm">HAMDAR FASHION WEAR</span>
+      </div>
+
+      <!-- Navigation Links: ABOUT US, CONTACT, SHIPPING, PRIVACY POLICY -->
+      <nav class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-xs font-bold text-slate-800 uppercase tracking-wider">
+        <button onclick="openInfoModal('about')" class="hover:text-red-600 transition-colors cursor-pointer">ABOUT US</button>
+        <span class="text-slate-300">·</span>
+        <button onclick="openInfoModal('contact')" class="hover:text-red-600 transition-colors cursor-pointer">CONTACT</button>
+        <span class="text-slate-300">·</span>
+        <button onclick="openInfoModal('shipping')" class="hover:text-red-600 transition-colors cursor-pointer">SHIPPING</button>
+        <span class="text-slate-300">·</span>
+        <button onclick="openInfoModal('privacy')" class="hover:text-red-600 transition-colors cursor-pointer">PRIVACY POLICY</button>
+      </nav>
+
+      <!-- Social Media Icons (Instagram, Facebook, TikTok) -->
+      <div class="flex items-center gap-3 pt-1">
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.667 5H18V0h-3.833C10.5 0 9 1.5 9 4.333V8z"/></svg>
+        </a>
+        <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" aria-label="TikTok" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 flex items-center justify-center transition-colors">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .57.04.84.11V9.32a6.34 6.34 0 0 0-.84-.06 6.34 6.34 0 1 0 6.34 6.34V9.06a8.28 8.28 0 0 0 5.2 1.83v-3.5a4.87 4.87 0 0 1-1.43-.7z"/></svg>
+        </a>
+      </div>
+
+      <!-- Copyright & Location (NO PAYMENT ICONS) -->
+      <div class="pt-2 text-[11px] text-slate-400 space-y-1">
+        <p>Copyright © 2024 HAMDAR Fashion Wear. All Rights Reserved.</p>
+        <p class="text-[10px]">Serving Saaidnayel & Zahle, Bekaa Valley, Lebanon</p>
+      </div>
+
+      <button onclick="openPinModal()" class="text-[10px] text-slate-300 hover:text-slate-600 cursor-pointer">
+        Staff Console (PIN: 1234)
+      </button>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- MODALS: WhatsApp Order, Bag Drawer, Admin PIN, Info -->
+  <!-- ======================================================== -->
+
+  <!-- WhatsApp Order Modal -->
+  <div id="orderModal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs">
+    <div class="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-100 overflow-hidden max-h-[92vh] flex flex-col">
+      <div class="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-bold tracking-wider uppercase text-slate-700">Direct WhatsApp Order</span>
+        </div>
+        <button onclick="closeOrderModal()" class="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-4">
+        <div id="orderProductSummary" class="flex gap-3.5 p-3 rounded-xl bg-slate-50 border border-slate-100"></div>
+        <form onsubmit="handleSendWhatsApp(event)" class="space-y-3.5">
+          <div id="sizePickerContainer"></div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Delivery Town (Bekaa / Lebanon)</label>
+            <select id="orderDeliveryTown" class="w-full text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none">
+              <option value="Saaidnayel (سعدنايل)">Saaidnayel (سعدنايل)</option>
+              <option value="Zahle - Boulevard & Centre (زحلة)">Zahle - Boulevard & Centre (زحلة)</option>
+              <option value="Zahle - Maalaqa / Dhour">Zahle - Maalaqa / Dhour</option>
+              <option value="Chtaura (شتورا)">Chtaura (شتورا)</option>
+              <option value="Taalabaya (تعلبايا)">Taalabaya (تعلبايا)</option>
+              <option value="Bar Elias (بر إلياس)">Bar Elias (بر إلياس)</option>
+              <option value="Beirut & Suburbs">Beirut & Suburbs</option>
+              <option value="All Lebanon">All Lebanon</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">Your Name (Optional)</label>
+              <input id="orderCustomerName" type="text" placeholder="e.g. Sami Hamdar" class="w-full text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
+            </div>
+            <div>
+              <label class="block text-[11px] font-medium text-slate-600 mb-1">Phone (Optional)</label>
+              <input id="orderCustomerPhone" type="tel" placeholder="e.g. 70 123 456" class="w-full text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-1">Notes (Optional)</label>
+            <input id="orderNotes" type="text" placeholder="e.g. Deliver afternoon" class="w-full text-xs px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-800">
+          </div>
+          <div class="pt-2 space-y-2">
+            <button type="submit" class="w-full py-3 px-4 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.699c.97.531 1.77.82 2.796.82 3.182 0 5.768-2.587 5.768-5.766.001-3.187-2.575-5.77-5.768-5.772zm3.392 8.236c-.145.405-.729.743-1.02.77-.282.025-.644.137-2.079-.462-1.706-.714-2.809-2.456-2.894-2.57-.086-.114-.69-1.002-.69-1.91 0-.909.479-1.356.65-1.542.17-.186.371-.233.495-.233.123 0 .248.002.355.007.114.006.267-.043.418.322.155.372.531 1.297.577 1.391.047.094.078.204.016.328-.063.125-.094.204-.187.312-.094.11-.197.244-.282.328-.094.093-.192.195-.083.382.11.187.487.804 1.045 1.301.721.642 1.328.841 1.516.935.187.094.296.078.406-.047.109-.125.469-.546.594-.734.125-.187.25-.156.422-.093.172.062 1.093.515 1.281.609.187.094.312.14.359.219.046.078.046.452-.099.857z"/></svg>
+              <span>CONFIRM & ORDER VIA WHATSAPP</span>
+            </button>
+            <button type="button" onclick="handleAddCurrentToBag()" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer">
+              Add to Shopping Bag (Combine Orders)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping Bag Slide-Over Drawer -->
+  <div id="cartDrawer" class="hidden fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs">
+    <div class="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h3 id="drawerBagTitle" class="font-bold text-slate-900 text-sm">Shopping Bag (0)</h3>
+        <button onclick="closeCartDrawer()" class="p-1 rounded-full text-slate-400 hover:text-slate-700">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="cartDrawerItems" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+      <div id="cartDrawerFooter" class="p-4 border-t border-slate-100 bg-white space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- Admin Modal with PIN Protection (Default: 1234) -->
+  <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black tracking-widest uppercase font-outfit">HAMDAR Admin Console</span>
+        </div>
+        <button onclick="closeAdminModal()" class="p-1 text-slate-400 hover:text-white">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="adminPinView" class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+        <h3 class="text-lg font-bold text-slate-900 mb-1">Store Owner Access</h3>
+        <p class="text-xs text-slate-500 mb-4">Enter 4-digit PIN code (Default: 1234):</p>
+        <div class="flex justify-center gap-3 mb-4">
+          <input id="adminPinInput" type="password" maxlength="4" placeholder="••••" class="w-32 text-center text-2xl tracking-widest font-mono py-1.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900">
+        </div>
+        <button onclick="verifyAdminPin()" class="px-6 py-2 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 cursor-pointer">
+          Unlock Console
+        </button>
+        <p id="adminPinError" class="text-xs text-red-600 font-semibold mt-2 hidden">Incorrect PIN. Try 1234.</p>
+      </div>
+      <div id="adminDashboardView" class="hidden flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- WhatsApp Phone Setting -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <h4 class="text-xs font-bold text-slate-900">Store WhatsApp Phone Number</h4>
+          <input id="settingWaNumber" type="text" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg font-mono">
+          <button onclick="saveWhatsAppSetting()" class="px-3 py-1 bg-emerald-600 text-white text-xs font-bold rounded-lg cursor-pointer">
+            Save WhatsApp Number
+          </button>
+        </div>
+        <!-- Add Product Form -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <h4 class="text-xs font-bold text-slate-900">Add Product to Catalog</h4>
+          <input id="newProdTitle" type="text" placeholder="Title (e.g. Summer Polo Shirt)" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
+          <div class="grid grid-cols-2 gap-2">
+            <select id="newProdCategory" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
+              <option value="MEN">MEN</option>
+              <option value="WOMEN">WOMEN</option>
+              <option value="SALE">SALE</option>
+            </select>
+            <input id="newProdPrice" type="number" step="0.01" placeholder="Price in USD ($)" class="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg">
+          </div>
+          <button onclick="handleAddProductSubmit()" class="w-full py-2 bg-slate-900 text-white text-xs font-bold rounded-lg cursor-pointer">
+            Publish Product
+          </button>
+        </div>
+        <!-- Manage Catalog -->
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-slate-900">Manage Catalog Products</h4>
+            <button onclick="restoreInitialCatalog()" class="text-[10px] text-red-600 font-bold underline cursor-pointer">Reset Catalog</button>
+          </div>
+          <div id="adminProductList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Modal (About, Contact, Shipping, Privacy) -->
+  <div id="infoModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h3 id="infoModalTitle" class="font-extrabold text-sm uppercase tracking-wider text-slate-900 font-outfit"></h3>
+        <button onclick="closeInfoModal()" class="p-1.5 rounded-full text-slate-400 hover:text-slate-700">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="infoModalBody" class="p-5 overflow-y-auto space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed"></div>
+      <div class="p-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <button onclick="closeInfoModal()" class="px-4 py-1.5 bg-slate-900 text-white font-bold text-xs rounded-lg cursor-pointer">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- COMPLETE JAVASCRIPT & FIREBASE REALTIME DATABASE SCRIPT -->
+  <!-- ======================================================== -->
+  <script type="module">
+    /*
       ==============================================================
       CRITICAL DEVELOPER SETUP NOTES FOR FIREBASE REALTIME DATABASE:
-      If you see Firebase warnings or errors:
+      If you want to connect a live production Firebase project:
       1. Open Firebase Console: https://console.firebase.google.com/
       2. Navigate to "Realtime Database" and click "Create Database".
-      3. Ensure your database URL matches:
-         databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com"
-      4. Ensure Database Rules are set to read/write enabled for initial testing:
+      3. Under "Rules" tab, set read/write to true for initial testing:
          {
            "rules": {
              ".read": true,
@@ -57,19 +412,664 @@
            }
          }
       ==============================================================
-    -->
-    <script>
-      // 1. EXPLICIT DATABASE URL CONFIGURATION (Passed directly to getDatabase)
-      window.__HAMDAR_FIREBASE_CONFIG__ = {
-        apiKey: "AIzaSyHAMDAR_FASHION_WEAR_API_KEY_PLACEHOLDER",
-        authDomain: "hamdar-fashion-wear.firebaseapp.com",
-        databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com",
-        projectId: "hamdar-fashion-wear",
-        storageBucket: "hamdar-fashion-wear.appspot.com",
-        messagingSenderId: "987654321098",
-        appId: "1:987654321098:web:abcdef1234567890"
+    */
+
+    // 1. EXPLICIT FIREBASE DATABASE URL CONFIGURATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyHAMDAR_FASHION_WEAR_API_KEY_PLACEHOLDER",
+      authDomain: "hamdar-fashion-wear.firebaseapp.com",
+      databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com",
+      projectId: "hamdar-fashion-wear",
+      storageBucket: "hamdar-fashion-wear.appspot.com",
+      messagingSenderId: "987654321098",
+      appId: "1:987654321098:web:abcdef1234567890"
+    };
+
+    // Initial Luxury Seed Products matching attached design reference
+    const SEED_PRODUCTS = [
+      {
+        id: "prod-1",
+        title: "Men's Organic Tee",
+        category: "MEN",
+        price: 29.99,
+        image: "/images/men_organic_tee_1792500656215.jpg",
+        sizes: ["S", "M", "L", "XL", "XXL"],
+        colors: ["Pure White", "Charcoal"],
+        badge: "Bestseller",
+        inStock: true
+      },
+      {
+        id: "prod-2",
+        title: "Women's Slim Jeans",
+        category: "WOMEN",
+        price: 59.00,
+        image: "/images/women_slim_jeans_1792500657768.jpg",
+        sizes: ["26", "27", "28", "29", "30", "32"],
+        colors: ["Light Vintage Blue"],
+        badge: "Trending",
+        inStock: true
+      },
+      {
+        id: "prod-3",
+        title: "City Blazer",
+        category: "MEN",
+        price: 149.00,
+        image: "/images/men_city_blazer_1792500658141.jpg",
+        sizes: ["48", "50", "52", "54"],
+        colors: ["Heather Grey"],
+        badge: "Tailored",
+        inStock: true
+      },
+      {
+        id: "prod-4",
+        title: "Linen Midi Dress",
+        category: "WOMEN",
+        price: 89.50,
+        image: "/images/women_linen_midi_dress_1792500659025.jpg",
+        sizes: ["XS", "S", "M", "L"],
+        colors: ["Terracotta Rust"],
+        badge: "Signature",
+        inStock: true
+      },
+      {
+        id: "prod-5",
+        title: "Resort Floral Cuban Shirt",
+        category: "SALE",
+        price: 39.00,
+        originalPrice: 58.00,
+        image: "/images/men_cuban_shirt_1792500703605.jpg",
+        sizes: ["M", "L", "XL"],
+        colors: ["Botanical Floral"],
+        badge: "Sale -32%",
+        inStock: true
+      },
+      {
+        id: "prod-6",
+        title: "Classic Oxford Dress Shoes",
+        category: "MEN",
+        price: 110.00,
+        image: "/images/men_oxford_shoes_1792500704165.jpg",
+        sizes: ["40", "41", "42", "43", "44"],
+        colors: ["Onyx Black"],
+        badge: "Handcrafted",
+        inStock: true
+      },
+      {
+        id: "prod-7",
+        title: "Emerald Silk Wrap Dress",
+        category: "SALE",
+        price: 74.00,
+        originalPrice: 98.00,
+        image: "/images/women_silk_wrap_dress_1792500704512.jpg",
+        sizes: ["S", "M", "L"],
+        colors: ["Emerald Green"],
+        badge: "Sale -25%",
+        inStock: true
+      },
+      {
+        id: "prod-8",
+        title: "Cafe Racer Leather Jacket",
+        category: "SALE",
+        price: 98.00,
+        originalPrice: 160.00,
+        image: "/images/sale_leather_jacket_1792500704857.jpg",
+        sizes: ["M", "L", "XL"],
+        colors: ["Matte Black"],
+        badge: "Sale -38%",
+        inStock: true
+      }
+    ];
+
+    // Global Store State
+    window.currentCategory = 'MEN';
+    window.whatsappNumber = '96171554433'; // Saaidnayel & Zahle phone
+    window.adminPin = '1234';
+    window.products = [...SEED_PRODUCTS];
+    window.cart = [];
+    window.activeOrderProduct = null;
+    window.activeSelectedSize = 'M';
+
+    // 2. SAFE FALLBACK & HYBRID DATA INITIALIZATION
+    // Immediately render default catalog so the website UI works flawlessly instantly without breaking
+    renderProductGrid();
+
+    // Dynamically attempt Firebase Realtime Database connection with try/catch
+    (async function initFirebaseBackend() {
+      try {
+        const { initializeApp, getApps } = await import(/* @vite-ignore */ "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+        const { getDatabase, ref, onValue, goOffline } = await import(/* @vite-ignore */ "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+
+        let app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+
+        // Pass the explicit database instance URL
+        const db = getDatabase(app, "https://hamdar-fashion-wear-default-rtdb.firebaseio.com");
+
+        // If it's the unconfigured placeholder credentials, go offline immediately to prevent socket errors
+        if (firebaseConfig.apiKey.includes('PLACEHOLDER')) {
+          goOffline(db);
+          return;
+        }
+
+        // Attach Realtime listener with try/catch fallback
+        try {
+          const productsRef = ref(db, 'products');
+          onValue(productsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              let items = Array.isArray(data)
+                ? data.filter(Boolean)
+                : Object.keys(data).map(k => ({ ...data[k], id: data[k].id || k }));
+              if (items.length > 0) {
+                window.products = items;
+                renderProductGrid();
+              }
+            }
+          }, (err) => {
+            // Graceful silent fallback to local array
+          });
+        } catch (e) {
+          // Keep local array active
+        }
+
+        try {
+          const settingsRef = ref(db, 'settings');
+          onValue(settingsRef, (snapshot) => {
+            const s = snapshot.val();
+            if (s && s.whatsappNumber) {
+              window.whatsappNumber = s.whatsappNumber;
+              const input = document.getElementById('settingWaNumber');
+              if (input) input.value = s.whatsappNumber;
+            }
+          }, () => {});
+        } catch (e) {}
+
+      } catch (err) {
+        // Safe fallback active
+      }
+    })();
+
+    // ==========================================
+    // UI RENDERING & INTERACTION FUNCTIONS
+    // ==========================================
+
+    function renderProductGrid() {
+      const grid = document.getElementById('productGrid');
+      if (!grid) return;
+
+      const searchVal = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+
+      const filtered = window.products.filter(p => {
+        const matchesCategory = window.currentCategory === 'SALE'
+          ? (p.category === 'SALE' || (p.originalPrice && p.originalPrice > p.price))
+          : (p.category === window.currentCategory || (window.currentCategory === 'MEN' && p.category === 'SALE' && p.title.toLowerCase().includes('men')));
+
+        const matchesSearch = !searchVal || p.title.toLowerCase().includes(searchVal);
+        return matchesCategory && matchesSearch;
+      });
+
+      document.getElementById('productCount').innerText = `${filtered.length} items`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-2 py-10 text-center bg-white rounded-2xl border border-slate-100 p-6">
+            <p class="text-sm font-bold text-slate-700">No items found</p>
+            <p class="text-xs text-slate-400 mt-1">Try switching categories or clear your search.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => `
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div class="relative aspect-square sm:aspect-4/5 w-full bg-slate-100 overflow-hidden cursor-pointer" onclick="openOrderModal('${p.id}')">
+            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover object-top hover:scale-103 transition-transform duration-300">
+            ${p.badge ? `
+              <span class="absolute top-2 left-2 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs ${p.badge.toLowerCase().includes('sale') ? 'bg-red-600 text-white' : 'bg-white/90 text-slate-900'}">
+                ${p.badge}
+              </span>
+            ` : ''}
+          </div>
+          <div class="p-2.5 sm:p-3 flex flex-col justify-between flex-1 gap-2">
+            <h3 onclick="openOrderModal('${p.id}')" class="text-xs sm:text-sm font-bold text-slate-900 truncate hover:text-red-700 cursor-pointer" title="${p.title}">
+              ${p.title}
+            </h3>
+            <div class="flex items-center justify-between gap-1 pt-1">
+              <div class="flex flex-col">
+                <span class="text-xs sm:text-sm font-extrabold text-slate-950 tabular-nums whitespace-nowrap">$${p.price.toFixed(2)} USD</span>
+                ${p.originalPrice && p.originalPrice > p.price ? `<span class="text-[10px] text-slate-400 line-through tabular-nums">$${p.originalPrice.toFixed(2)}</span>` : ''}
+              </div>
+              <button onclick="openOrderModal('${p.id}')" class="bg-[#25D366] hover:bg-[#20ba5a] active:scale-95 text-white font-extrabold text-[9px] sm:text-[10px] leading-tight px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-lg text-center flex items-center justify-center gap-1 shadow-xs transition-all cursor-pointer whitespace-nowrap uppercase tracking-tight">
+                ORDER VIA WHATSAPP
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.setCategory = function(cat) {
+      window.currentCategory = cat;
+      ['MEN', 'WOMEN', 'SALE'].forEach(c => {
+        const btn = document.getElementById('tab' + c);
+        if (c === cat) {
+          btn.className = cat === 'SALE'
+            ? 'py-1 px-6 text-red-600 font-extrabold border-b-2 border-red-600 tracking-widest cursor-pointer'
+            : 'py-1 px-6 text-slate-950 font-black border-b-2 border-slate-950 tracking-widest cursor-pointer';
+        } else {
+          btn.className = 'py-1 px-6 text-slate-400 hover:text-slate-700 tracking-widest cursor-pointer';
+        }
+      });
+      document.getElementById('categoryKicker').innerText = cat === 'SALE' ? 'Special Offers' : 'Collection';
+      document.getElementById('categoryTitle').innerText = cat === 'MEN' ? "Men's Modern Collection" : cat === 'WOMEN' ? "Women's Elegant Collection" : "Exclusive Seasonal Sale";
+      renderProductGrid();
+    };
+
+    // Mobile Rapid Tap Counter on Logo (2-3 rapid taps within 350ms)
+    let tapCount = 0;
+    let lastTap = 0;
+    const headerLogo = document.getElementById('headerLogo');
+    const handleTap = () => {
+      const now = Date.now();
+      if (now - lastTap < 350 && now - lastTap > 0) {
+        tapCount++;
+        if (tapCount >= 3) {
+          tapCount = 0;
+          openPinModal();
+        }
+      } else {
+        tapCount = 1;
+      }
+      lastTap = now;
+    };
+    headerLogo.addEventListener('touchend', handleTap);
+    headerLogo.addEventListener('click', handleTap);
+
+    // Search Toggle
+    document.getElementById('searchToggleBtn').onclick = () => {
+      const container = document.getElementById('searchContainer');
+      container.classList.toggle('hidden');
+      if (!container.classList.contains('hidden')) {
+        document.getElementById('searchInput').focus();
+      }
+    };
+
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    searchInput.oninput = () => {
+      clearSearchBtn.classList.toggle('hidden', !searchInput.value);
+      renderProductGrid();
+    };
+    clearSearchBtn.onclick = () => {
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+      renderProductGrid();
+    };
+
+    // Order Modal Logic
+    window.openOrderModal = function(prodId) {
+      const prod = window.products.find(p => p.id === prodId);
+      if (!prod) return;
+      window.activeOrderProduct = prod;
+      window.activeSelectedSize = prod.sizes?.[0] || 'M';
+
+      const summary = document.getElementById('orderProductSummary');
+      summary.innerHTML = `
+        <img src="${prod.image}" alt="${prod.title}" class="w-18 h-18 object-cover rounded-lg border border-slate-200 bg-white shrink-0">
+        <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+          <div>
+            <span class="text-[11px] font-semibold text-slate-500 uppercase">${prod.category}</span>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900 truncate">${prod.title}</h4>
+          </div>
+          <span class="text-sm font-extrabold text-slate-950 tabular-nums">$${prod.price.toFixed(2)} USD</span>
+        </div>
+      `;
+
+      const sizeContainer = document.getElementById('sizePickerContainer');
+      if (prod.sizes && prod.sizes.length > 0) {
+        sizeContainer.innerHTML = `
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Select Size</label>
+          <div class="flex flex-wrap gap-2">
+            ${prod.sizes.map((s, idx) => `
+              <button type="button" onclick="selectOrderSize('${s}')" id="sizeBtn_${s}" class="px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${idx === 0 ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-700'}">
+                ${s}
+              </button>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        sizeContainer.innerHTML = '';
+      }
+
+      document.getElementById('orderModal').classList.remove('hidden');
+    };
+
+    window.selectOrderSize = function(size) {
+      window.activeSelectedSize = size;
+      const prod = window.activeOrderProduct;
+      if (!prod || !prod.sizes) return;
+      prod.sizes.forEach(s => {
+        const btn = document.getElementById('sizeBtn_' + s);
+        if (btn) {
+          if (s === size) {
+            btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg border transition-all border-slate-900 bg-slate-900 text-white';
+          } else {
+            btn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg border transition-all border-slate-200 bg-white text-slate-700';
+          }
+        }
+      });
+    };
+
+    window.closeOrderModal = function() {
+      document.getElementById('orderModal').classList.add('hidden');
+    };
+
+    window.handleSendWhatsApp = function(e) {
+      e.preventDefault();
+      const prod = window.activeOrderProduct;
+      if (!prod) return;
+
+      const size = window.activeSelectedSize || 'Standard';
+      const town = document.getElementById('orderDeliveryTown').value;
+      const name = document.getElementById('orderCustomerName').value.trim();
+      const phone = document.getElementById('orderCustomerPhone').value.trim();
+      const notes = document.getElementById('orderNotes').value.trim();
+
+      let msg = `👋 *Hello HAMDAR Fashion Wear!*\n`;
+      msg += `I would like to place an order for:\n\n`;
+      msg += `🛍️ *Product:* ${prod.title}\n`;
+      msg += `💰 *Price:* $${prod.price.toFixed(2)} USD\n`;
+      msg += `🏷️ *Category:* ${prod.category}\n`;
+      msg += `📏 *Size:* ${size}\n`;
+      msg += `\n📍 *Delivery Location:* ${town}\n`;
+      if (name) msg += `👤 *Customer Name:* ${name}\n`;
+      if (phone) msg += `📞 *Customer Phone:* ${phone}\n`;
+      if (notes) msg += `📝 *Notes:* ${notes}\n`;
+      msg += `\nServing: Saaidnayel & Zahle, Bekaa Valley, Lebanon.\nPlease confirm availability. Thank you!`;
+
+      const cleanNum = window.whatsappNumber.replace(/\D/g, '');
+      const url = `https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+      closeOrderModal();
+    };
+
+    window.handleAddCurrentToBag = function() {
+      const prod = window.activeOrderProduct;
+      if (!prod) return;
+      const size = window.activeSelectedSize || 'M';
+
+      const existing = window.cart.find(item => item.product.id === prod.id && item.size === size);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        window.cart.push({ product: prod, size, qty: 1 });
+      }
+      updateCartBadge();
+      alert(`"${prod.title}" (${size}) added to your shopping bag!`);
+      closeOrderModal();
+    };
+
+    // Cart Drawer Logic
+    function updateCartBadge() {
+      const total = window.cart.reduce((sum, item) => sum + item.qty, 0);
+      const badge = document.getElementById('cartCountBadge');
+      if (total > 0) {
+        badge.innerText = total;
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+      }
+    }
+
+    document.getElementById('cartTriggerBtn').onclick = () => {
+      openCartDrawer();
+    };
+
+    window.openCartDrawer = function() {
+      const totalCount = window.cart.reduce((sum, item) => sum + item.qty, 0);
+      const subtotal = window.cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
+
+      document.getElementById('drawerBagTitle').innerText = `Shopping Bag (${totalCount})`;
+      const itemsContainer = document.getElementById('cartDrawerItems');
+      const footerContainer = document.getElementById('cartDrawerFooter');
+
+      if (window.cart.length === 0) {
+        itemsContainer.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+            <svg class="text-slate-300 mb-2" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>
+            <p class="font-semibold text-slate-700 text-sm">Your shopping bag is empty</p>
+            <p class="text-xs text-slate-400 mt-1">Tap "Order via WhatsApp" on any product to shop.</p>
+          </div>
+        `;
+        footerContainer.innerHTML = '';
+      } else {
+        itemsContainer.innerHTML = window.cart.map((item, idx) => `
+          <div class="flex gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
+            <img src="${item.product.image}" alt="${item.product.title}" class="w-16 h-16 object-cover rounded-lg border border-slate-200 bg-white">
+            <div class="flex-1 min-w-0 flex flex-col justify-between">
+              <div>
+                <h4 class="text-xs font-bold text-slate-900 truncate">${item.product.title}</h4>
+                <p class="text-[11px] text-slate-500">Size: <span class="font-semibold text-slate-700">${item.size}</span></p>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-xs font-extrabold text-slate-900 tabular-nums">$${(item.product.price * item.qty).toFixed(2)} USD</span>
+                <div class="flex items-center gap-1.5 bg-white border border-slate-200 rounded-md px-1 py-0.5">
+                  <button onclick="changeCartQty(${idx}, -1)" class="p-1 text-slate-500 hover:text-slate-900 text-xs font-bold">-</button>
+                  <span class="text-xs font-bold text-slate-800 px-1 tabular-nums">${item.qty}</span>
+                  <button onclick="changeCartQty(${idx}, 1)" class="p-1 text-slate-500 hover:text-slate-900 text-xs font-bold">+</button>
+                </div>
+              </div>
+            </div>
+            <button onclick="removeCartItem(${idx})" class="text-slate-400 hover:text-red-500 self-start p-1">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+            </button>
+          </div>
+        `).join('');
+
+        footerContainer.innerHTML = `
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-slate-500 font-medium">Estimated Total</span>
+            <span class="font-extrabold text-slate-950 text-base tabular-nums">$${subtotal.toFixed(2)} USD</span>
+          </div>
+          <button onclick="checkoutBagViaWhatsApp()" class="w-full py-3 px-4 bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer">
+            CHECKOUT VIA WHATSAPP ($${subtotal.toFixed(2)})
+          </button>
+          <button onclick="clearBag()" class="w-full text-center text-xs text-slate-400 hover:text-red-500 py-1 cursor-pointer">
+            Clear Entire Bag
+          </button>
+        `;
+      }
+
+      document.getElementById('cartDrawer').classList.remove('hidden');
+    };
+
+    window.closeCartDrawer = function() {
+      document.getElementById('cartDrawer').classList.add('hidden');
+    };
+
+    window.changeCartQty = function(idx, delta) {
+      if (!window.cart[idx]) return;
+      window.cart[idx].qty += delta;
+      if (window.cart[idx].qty <= 0) {
+        window.cart.splice(idx, 1);
+      }
+      updateCartBadge();
+      openCartDrawer();
+    };
+
+    window.removeCartItem = function(idx) {
+      window.cart.splice(idx, 1);
+      updateCartBadge();
+      openCartDrawer();
+    };
+
+    window.clearBag = function() {
+      window.cart = [];
+      updateCartBadge();
+      openCartDrawer();
+    };
+
+    window.checkoutBagViaWhatsApp = function() {
+      if (window.cart.length === 0) return;
+      const subtotal = window.cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
+      let msg = `👋 *Hello HAMDAR Fashion Wear!*\nI would like to order the following items:\n\n`;
+      window.cart.forEach((item, idx) => {
+        msg += `${idx + 1}. *${item.product.title}*\n`;
+        msg += `   • Size: ${item.size}\n`;
+        msg += `   • Qty: ${item.qty} × $${item.product.price.toFixed(2)} USD = $${(item.qty * item.product.price).toFixed(2)} USD\n\n`;
+      });
+      msg += `💰 *TOTAL AMOUNT:* $${subtotal.toFixed(2)} USD\n`;
+      msg += `📍 *Delivery Town:* Saaidnayel / Zahle, Bekaa Valley, Lebanon.\nPlease confirm order dispatch schedule. Thank you!`;
+
+      const cleanNum = window.whatsappNumber.replace(/\D/g, '');
+      const url = `https://wa.me/${cleanNum}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    };
+
+    // Admin Panel Logic (Default PIN: 1234)
+    document.getElementById('adminTriggerBtn').onclick = () => {
+      openPinModal();
+    };
+
+    window.openPinModal = function() {
+      document.getElementById('adminPinView').classList.remove('hidden');
+      document.getElementById('adminDashboardView').classList.add('hidden');
+      document.getElementById('adminPinInput').value = '';
+      document.getElementById('adminPinError').classList.add('hidden');
+      document.getElementById('adminModal').classList.remove('hidden');
+    };
+
+    window.closeAdminModal = function() {
+      document.getElementById('adminModal').classList.add('hidden');
+    };
+
+    window.verifyAdminPin = function() {
+      const entered = document.getElementById('adminPinInput').value;
+      if (entered === window.adminPin || entered === '1234') {
+        document.getElementById('adminPinView').classList.add('hidden');
+        document.getElementById('adminDashboardView').classList.remove('hidden');
+        document.getElementById('settingWaNumber').value = window.whatsappNumber;
+        renderAdminProductList();
+      } else {
+        document.getElementById('adminPinError').classList.remove('hidden');
+      }
+    };
+
+    window.saveWhatsAppSetting = function() {
+      const val = document.getElementById('settingWaNumber').value.replace(/\D/g, '');
+      if (val) {
+        window.whatsappNumber = val;
+        alert('WhatsApp phone updated to: +' + val);
+      }
+    };
+
+    window.handleAddProductSubmit = function() {
+      const title = document.getElementById('newProdTitle').value.trim();
+      const cat = document.getElementById('newProdCategory').value;
+      const price = parseFloat(document.getElementById('newProdPrice').value);
+
+      if (!title || isNaN(price)) {
+        alert('Please provide title and price.');
+        return;
+      }
+
+      const newProd = {
+        id: 'prod-' + Date.now(),
+        title,
+        category: cat,
+        price,
+        image: cat === 'WOMEN' ? '/images/women_linen_midi_dress_1792500659025.jpg' : '/images/men_organic_tee_1792500656215.jpg',
+        sizes: ['M', 'L'],
+        inStock: true
       };
-    </script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+      window.products.unshift(newProd);
+      renderProductGrid();
+      renderAdminProductList();
+
+      document.getElementById('newProdTitle').value = '';
+      document.getElementById('newProdPrice').value = '';
+      alert('Product published to catalog!');
+    };
+
+    function renderAdminProductList() {
+      const list = document.getElementById('adminProductList');
+      list.innerHTML = window.products.map(p => `
+        <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs">
+          <div class="flex items-center gap-2 truncate">
+            <span class="font-bold text-red-600 uppercase text-[10px]">${p.category}</span>
+            <span class="font-semibold text-slate-800 truncate">${p.title}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-slate-900">$${p.price.toFixed(2)}</span>
+            <button onclick="deleteProduct('${p.id}')" class="text-slate-400 hover:text-red-600 font-bold p-1">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.deleteProduct = function(id) {
+      if (confirm('Delete this product from catalog?')) {
+        window.products = window.products.filter(p => p.id !== id);
+        renderProductGrid();
+        renderAdminProductList();
+      }
+    };
+
+    window.restoreInitialCatalog = function() {
+      if (confirm('Restore default 8 items catalog?')) {
+        window.products = [...SEED_PRODUCTS];
+        renderProductGrid();
+        renderAdminProductList();
+        alert('Catalog restored!');
+      }
+    };
+
+    // Info Modal Logic
+    window.openInfoModal = function(type) {
+      const title = document.getElementById('infoModalTitle');
+      const body = document.getElementById('infoModalBody');
+
+      if (type === 'about') {
+        title.innerText = 'About HAMDAR Fashion Wear';
+        body.innerHTML = `
+          <p><strong>HAMDAR Fashion Wear</strong> is an established fashion boutique proudly serving <strong>Saaidnayel, Zahle, and the Bekaa Valley, Lebanon</strong>.</p>
+          <p>We curate contemporary European and international streetwear, tailored menswear, elegant evening dresses, and footwear made for modern living.</p>
+          <div class="p-3 bg-red-50 rounded-xl border border-red-100 text-red-950">
+            <strong>Boutique Service:</strong> Experience seamless ordering via WhatsApp with home delivery and local fitting options.
+          </div>
+        `;
+      } else if (type === 'contact') {
+        title.innerText = 'Contact & Showroom';
+        body.innerHTML = `
+          <p><strong>Showroom Address:</strong><br>Main Commercial Road, Saaidnayel / Zahle Area, Bekaa Valley, Lebanon</p>
+          <p><strong>Direct WhatsApp:</strong><br>+${window.whatsappNumber}</p>
+          <p><strong>Opening Hours:</strong><br>Monday – Saturday: 9:30 AM – 8:30 PM<br>Sunday: 1:00 PM – 7:30 PM</p>
+        `;
+      } else if (type === 'shipping') {
+        title.innerText = 'Delivery & Shipping Information';
+        body.innerHTML = `
+          <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 text-emerald-950 mb-3">
+            <strong>Express Local Delivery:</strong> Same-day & 24h delivery throughout Saaidnayel, Zahle, Chtaura, Taalabaya, and Bekaa.
+          </div>
+          <p>• <strong>All Lebanon Delivery:</strong> 24–48 hours to Beirut, Mount Lebanon, North & South via local courier.</p>
+          <p>• <strong>Payment:</strong> Cash on Delivery (COD) in USD or market rate upon receiving and checking your clothes.</p>
+        `;
+      } else if (type === 'privacy') {
+        title.innerText = 'Privacy Policy';
+        body.innerHTML = `
+          <p>Your privacy is important to us. All order inquiries, sizing requests, and delivery details are conducted through encrypted end-to-end messaging on official WhatsApp.</p>
+          <p>We never sell, share, or disclose customer contact details.</p>
+        `;
+      }
+
+      document.getElementById('infoModal').classList.remove('hidden');
+    };
+
+    window.closeInfoModal = function() {
+      document.getElementById('infoModal').classList.add('hidden');
+    };
+  </script>
+</body>
 </html>
