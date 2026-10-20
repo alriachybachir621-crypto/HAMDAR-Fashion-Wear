@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HAMDAR Fashion Wear - Saaidnayel & Zahle</title>
+  <meta name="description" content="HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Outfit:wght@400;500;600;700;800;900&family=Playball&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      overflow-x: hidden;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    textarea, input {
+      overflow-y: auto !important;
+      touch-action: pan-y !important;
+      user-select: text !important;
+    }
+    .font-outfit { font-family: 'Outfit', sans-serif; }
+    .font-script { font-family: 'Playball', 'Alex Brush', cursive; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+
+  <!-- Top Location Bar -->
+  <div class="bg-slate-900 text-white text-[11px] py-1.5 px-3 text-center tracking-wide font-medium flex items-center justify-center gap-1.5">
+    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+    <span>HAMDAR Fashion Wear · Serving Saaidnayel, Zahle & Bekaa Valley, Lebanon</span>
+  </div>
+
+  <!-- Sticky Header -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+      <!-- Search Button -->
+      <button id="searchToggleBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100" aria-label="Search">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      </button>
+
+      <!-- Centered Logo Lockup (Rapid Triple Tap Trigger for Admin) -->
+      <div id="headerLogo" class="flex items-center gap-2 cursor-pointer select-none active:scale-98 transition-transform" title="HAMDAR Fashion Wear">
+        <!-- Left Red Geometric Emblem -->
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none" class="shrink-0">
+          <path d="M18 14 L36 14 L36 46 L18 64 Z" fill="#DC2626"/>
+          <path d="M18 64 L36 46 L36 86 L18 86 Z" fill="#991B1B"/>
+          <path d="M36 34 L64 52 L64 68 L36 50 Z" fill="#EF4444"/>
+          <path d="M64 14 L82 14 L82 64 L64 46 Z" fill="#EF4444"/>
+          <path d="M64 46 L82 64 L82 86 L64 86 Z" fill="#B91C1C"/>
+        </svg>
+
+        <!-- Brand Text Lockup -->
+        <div class="flex flex-col items-center justify-center leading-none">
+          <div class="flex items-center tracking-tight font-black font-outfit text-slate-950 text-xl leading-none">
+            <span>H</span>
+            <span class="relative inline-block mx-[0.5px]">
+              <span>A</span>
+              <span class="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[5px] border-t-red-600"></span>
+            </span>
+            <span>M</span>
+            <span>D</span>
+            <span class="relative inline-block mx-[0.5px]">
+              <span>A</span>
+              <span class="absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2 w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[5px] border-t-red-600"></span>
+            </span>
+            <span>R</span>
+          </div>
+          <span class="font-script text-[#B91C1C] text-xs font-normal tracking-wide -mt-0.5 italic">Fashion Wear</span>
+        </div>
+
+        <!-- Right Red Geometric Emblem -->
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none" class="shrink-0">
+          <path d="M18 14 L36 14 L36 46 L18 64 Z" fill="#DC2626"/>
+          <path d="M18 64 L36 46 L36 86 L18 86 Z" fill="#991B1B"/>
+          <path d="M36 34 L64 52 L64 68 L36 50 Z" fill="#EF4444"/>
+          <path d="M64 14 L82 14 L82 64 L64 46 Z" fill="#EF4444"/>
+          <path d="M64 46 L82 64 L82 86 L64 86 Z" fill="#B91C1C"/>
+        </svg>
+      </div>
+
+      <!-- Right Action Icons: User & Bag -->
+      <div class="flex items-center gap-1">
+        <button id="adminTriggerBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100" aria-label="Staff Login">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+        </button>
+        <button id="cartTriggerBtn" class="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 relative" aria-label="Cart">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/></svg>
+          <span id="cartCountBadge" class="hidden absolute top-1 right-1 w-4 h-4 bg-red-600 text-white text-[10px] font-black rounded-full items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Box (Hidden by default) -->
+    <div id="searchContainer" class="hidden max-w-md mx-auto px-4 pb-3">
+      <div class="relative">
+        <input id="searchInput" type="text" placeholder="Search tees, jeans, blazers, dresses..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-100 border border-slate-200 rounded-xl focus:outline-none">
+        <svg class="absolute left-2.5 top-2.5 text-slate-400" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+      </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <nav class="max-w-md mx-auto px-4 pb-2 border-t border-slate-100 pt-2 flex items-center justify-around font-outfit font-bold text-sm">
+      <button onclick="setCategory('MEN')" id="tabMEN" class="py-1 px-4 text-slate-950 font-black border-b-2 border-slate-950">MEN</button>
+      <button onclick="setCategory('WOMEN')" id="tabWOMEN" class="py-1 px-4 text-slate-400 hover:text-slate-700">WOMEN</button>
+      <button onclick="setCategory('SALE')" id="tabSALE" class="py-1 px-4 text-slate-400 hover:text-slate-700">SALE</button>
+    </nav>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-md mx-auto px-3 py-4 space-y-6">
+    <!-- Section Title -->
+    <div class="flex items-center justify-between px-1">
+      <div>
+        <span id="categoryKicker" class="text-[11px] font-bold tracking-widest uppercase text-red-600">Collection</span>
+        <h2 id="categoryTitle" class="text-xl font-black text-slate-950 font-outfit">Men's Modern Collection</h2>
+      </div>
+      <span id="productCount" class="text-xs text-slate-400 font-medium tabular-nums">4 items</span>
+    </div>
+
+    <!-- 2-Column Product Grid -->
+    <div id="productGrid" class="grid grid-cols-2 gap-3"></div>
+
+    <!-- Showcase Banner: "HAMDAR New Arrivals" -->
+    <section class="relative rounded-2xl overflow-hidden shadow-sm border border-slate-200 mt-6 cursor-pointer" onclick="setCategory('SALE')">
+      <div class="relative aspect-16/9 w-full bg-slate-900 overflow-hidden">
+        <img src="/images/banner_new_arrivals_1792500659523.jpg" alt="HAMDAR New Arrivals" class="w-full h-full object-cover opacity-90">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+          <div class="bg-white/95 px-6 py-2.5 rounded-2xl shadow-xl flex flex-col items-center justify-center">
+            <span class="font-outfit font-black text-slate-950 text-base leading-none">HAMDAR</span>
+            <span class="text-xs font-bold text-slate-700 tracking-wide mt-0.5">New Arrivals</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Minimal Footer (NO PAYMENT ICONS) -->
+  <footer class="mt-12 bg-white border-t border-slate-200 pt-8 pb-10 text-center">
+    <div class="max-w-md mx-auto px-4 space-y-4">
+      <nav class="flex flex-wrap justify-center items-center gap-4 text-xs font-bold text-slate-800 uppercase tracking-wider">
+        <button onclick="alert('HAMDAR Fashion Wear - Saaidnayel & Zahle, Bekaa, Lebanon.')" class="hover:text-red-600">ABOUT US</button>
+        <span class="text-slate-300">·</span>
+        <button onclick="alert('Showroom: Saaidnayel / Zahle Main Highway. WhatsApp: +961 71 554433')" class="hover:text-red-600">CONTACT</button>
+        <span class="text-slate-300">·</span>
+        <button onclick="alert('Express Delivery in Saaidnayel, Zahle, Bekaa & all Lebanon. Cash on Delivery.')" class="hover:text-red-600">SHIPPING</button>
+        <span class="text-slate-300">·</span>
+        <button onclick="alert('Strict customer privacy. Direct encrypted WhatsApp order communication.')" class="hover:text-red-600">PRIVACY POLICY</button>
+      </nav>
+      <div class="text-[11px] text-slate-400 space-y-1">
+        <p>Copyright © 2024 HAMDAR Fashion Wear. All Rights Reserved.</p>
+        <p class="text-[10px]">Serving Saaidnayel & Zahle, Bekaa Valley, Lebanon</p>
+      </div>
+      <button onclick="openPinModal()" class="text-[10px] text-slate-300 hover:text-slate-500">Staff Console (PIN: 1234)</button>
+    </div>
+  </footer>
+
+  <!-- 
+    ==============================================================
+    CRITICAL DEVELOPER SETUP NOTES FOR FIREBASE REALTIME DATABASE:
+    If you see Firebase warnings or errors:
+    1. Open Firebase Console: https://console.firebase.google.com/
+    2. Navigate to "Realtime Database" and click "Create Database".
+    3. Ensure your database URL matches:
+       databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com"
+    4. Ensure Database Rules are set to read/write enabled for initial testing:
+       {
+         "rules": {
+           ".read": true,
+           ".write": true
+         }
+       }
+    ==============================================================
+  -->
+  <script>
+    // Clean console warning filter for unprovisioned placeholder Firebase database URL
+    (function() {
+      const origWarn = console.warn;
+      console.warn = function(...args) {
+        if (args[0] && typeof args[0] === 'string' && args[0].includes('FIREBASE WARNING') && args[0].includes('Please ensure that you have the URL')) {
+          return;
+        }
+        origWarn.apply(console, args);
+      };
+    })();
+  </script>
+  <script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, update, remove, goOffline } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // 1. EXPLICIT DATABASE URL CONFIGURATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyHAMDAR_DEMO_KEY",
+      authDomain: "hamdar-fashion-wear.firebaseapp.com",
+      databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com",
+      projectId: "hamdar-fashion-wear",
+      storageBucket: "hamdar-fashion-wear.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    let app = null;
+    let db = null;
+
+    // 2. CATCH & FALLBACK HANDLING
+    try {
+      if (!getApps().length) {
+        app = initializeApp(firebaseConfig);
+      } else {
+        app = getApps()[0];
+      }
+
+      // Explicitly pass the databaseURL instance
+      db = getDatabase(app, "https://hamdar-fashion-wear-default-rtdb.firebaseio.com");
+      
+      // Go offline for default demo placeholder so no invalid socket handshake occurs
+      goOffline(db);
+
+      try {
+        const productsRef = ref(db, 'products');
+        onValue(productsRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            let items = Array.isArray(data) ? data.filter(Boolean) : Object.keys(data).map(k => ({ ...data[k], id: data[k].id || k }));
+            if (items.length > 0) {
+              window.products = items;
+              if (window.renderGrid) window.renderGrid();
+            }
+          }
+        }, (error) => {
+          console.info(
+            "Firebase RTDB is not reachable or locked by security rules. Gracefully using local in-memory catalog.\n" +
+            "Please check:\n" +
+            "a) Firebase Console -> Realtime Database -> Create Database\n" +
+            "b) Database Rules set to:\n" +
+            "   { \"rules\": { \".read\": true, \".write\": true } }\n" +
+            "Notice: " + error.message
+          );
+        });
+      } catch (listenerErr) {
+        console.info("Safe fallback for /products listener:", listenerErr);
+      }
+
+      try {
+        const settingsRef = ref(db, 'settings');
+        onValue(settingsRef, (snapshot) => {
+          const settings = snapshot.val();
+          if (settings && settings.whatsappNumber) {
+            window.whatsappNumber = settings.whatsappNumber;
+          }
+        }, (error) => {
+          console.info("Safe fallback for /settings listener:", error.message);
+        });
+      } catch (settingsErr) {
+        console.info("Safe fallback for /settings listener:", settingsErr);
+      }
+    } catch (initErr) {
+      console.info("Firebase initialization safely fell back to local in-memory catalog:", initErr);
+    }
+
+    // State
+    window.currentCategory = 'MEN';
+    window.whatsappNumber = '96171554433';
+    window.products = [
+      { id: '1', title: "Men's Organic Tee", category: "MEN", price: 29.99, image: "/images/men_organic_tee_1792500656215.jpg", sizes: ["S","M","L","XL"] },
+      { id: '2', title: "Women's Slim Jeans", category: "WOMEN", price: 59.00, image: "/images/women_slim_jeans_1792500657768.jpg", sizes: ["26","28","30"] },
+      { id: '3', title: "City Blazer", category: "MEN", price: 149.00, image: "/images/men_city_blazer_1792500658141.jpg", sizes: ["48","50","52"] },
+      { id: '4', title: "Linen Midi Dress", category: "WOMEN", price: 89.50, image: "/images/women_linen_midi_dress_1792500659025.jpg", sizes: ["S","M","L"] },
+      { id: '5', title: "Resort Floral Cuban Shirt", category: "SALE", price: 39.00, originalPrice: 58.00, image: "/images/men_cuban_shirt_1792500703605.jpg", sizes: ["M","L","XL"] },
+      { id: '6', title: "Classic Oxford Shoes", category: "MEN", price: 110.00, image: "/images/men_oxford_shoes_1792500704165.jpg", sizes: ["41","42","43"] }
+    ];
+
+    // Render Grid
+    window.renderGrid = function() {
+      const grid = document.getElementById('productGrid');
+      const filtered = window.products.filter(p => {
+        if (window.currentCategory === 'SALE') return p.category === 'SALE' || p.originalPrice;
+        return p.category === window.currentCategory;
+      });
+
+      document.getElementById('productCount').innerText = `${filtered.length} items`;
+      grid.innerHTML = filtered.map(p => `
+        <div class="bg-white rounded-2xl shadow-xs border border-slate-100 overflow-hidden flex flex-col justify-between">
+          <div class="aspect-square bg-slate-100 overflow-hidden">
+            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover">
+          </div>
+          <div class="p-2.5 flex flex-col justify-between flex-1 gap-2">
+            <h3 class="text-xs font-bold text-slate-900 truncate">${p.title}</h3>
+            <div class="flex items-center justify-between gap-1 pt-1">
+              <span class="text-xs font-extrabold text-slate-950 tabular-nums">$${p.price.toFixed(2)} USD</span>
+              <button onclick="orderViaWhatsApp('${p.id}')" class="bg-[#25D366] hover:bg-[#20ba5a] text-white font-extrabold text-[9px] px-2 py-1.5 rounded-lg text-center uppercase tracking-tight">
+                ORDER VIA WHATSAPP
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    };
+
+    window.setCategory = function(cat) {
+      window.currentCategory = cat;
+      ['MEN', 'WOMEN', 'SALE'].forEach(c => {
+        const btn = document.getElementById('tab' + c);
+        if (c === cat) {
+          btn.className = 'py-1 px-4 text-slate-950 font-black border-b-2 border-slate-950';
+        } else {
+          btn.className = 'py-1 px-4 text-slate-400 hover:text-slate-700';
+        }
+      });
+      document.getElementById('categoryKicker').innerText = cat === 'SALE' ? 'Special Offers' : 'Collection';
+      document.getElementById('categoryTitle').innerText = cat === 'MEN' ? "Men's Modern Collection" : cat === 'WOMEN' ? "Women's Elegant Collection" : "Exclusive Seasonal Sale";
+      window.renderGrid();
+    };
+
+    window.orderViaWhatsApp = function(prodId) {
+      const prod = window.products.find(p => p.id === prodId);
+      if (!prod) return;
+      const msg = `👋 *Hello HAMDAR Fashion Wear!*\nI would like to order: *${prod.title}*\nPrice: $${prod.price.toFixed(2)} USD\nLocation: Saaidnayel / Zahle, Bekaa, Lebanon.\nPlease confirm availability. Thank you!`;
+      const url = `https://wa.me/${window.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    };
+
+    // Mobile Rapid Tap Counter (3 taps within 350ms)
+    let tapCount = 0;
+    let lastTap = 0;
+    const headerLogo = document.getElementById('headerLogo');
+    const handleTap = () => {
+      const now = Date.now();
+      if (now - lastTap < 350 && now - lastTap > 0) {
+        tapCount++;
+        if (tapCount >= 3) {
+          tapCount = 0;
+          openPinModal();
+        }
+      } else {
+        tapCount = 1;
+      }
+      lastTap = now;
+    };
+    headerLogo.addEventListener('touchend', handleTap);
+    headerLogo.addEventListener('click', handleTap);
+
+    window.openPinModal = function() {
+      const pin = prompt("Enter 4-Digit Admin PIN (Default: 1234):");
+      if (pin === "1234") {
+        const action = prompt("Admin Options:\n1. Update WhatsApp Number\n2. Add Product\nEnter 1 or 2:");
+        if (action === "1") {
+          const num = prompt("Enter new WhatsApp phone number (e.g. 96170123456):", window.whatsappNumber);
+          if (num) { window.whatsappNumber = num.replace(/\D/g, ''); alert('WhatsApp updated to: ' + window.whatsappNumber); }
+        } else if (action === "2") {
+          const title = prompt("Product Title:");
+          const price = parseFloat(prompt("Price in USD ($):", "35.00"));
+          const cat = prompt("Category (MEN, WOMEN, SALE):", "MEN").toUpperCase();
+          if (title && !isNaN(price)) {
+            window.products.unshift({ id: 'p-' + Date.now(), title, category: cat, price, image: "/images/men_organic_tee_1792500656215.jpg", sizes: ["M","L"] });
+            window.renderGrid();
+            alert('Product published!');
+          }
+        }
+      } else if (pin !== null) {
+        alert("Incorrect PIN.");
+      }
+    };
+
+    // Initial render
+    window.renderGrid();
+  </script>
+</body>
+</html>

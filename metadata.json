@@ -1,0 +1,6 @@
+{
+  "name": "HAMDAR Fashion Wear - Saaidnayel & Zahle",
+  "description": "HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

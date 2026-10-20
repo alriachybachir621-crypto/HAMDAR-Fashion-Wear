@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>HAMDAR Fashion Wear - Saaidnayel & Zahle</title>
+    <meta name="description" content="HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon." />
+    <meta property="og:title" content="HAMDAR Fashion Wear - Saaidnayel & Zahle" />
+    <meta property="og:description" content="HAMDAR Fashion Wear online boutique catalog for Men and Women with instant WhatsApp ordering and real-time cloud catalog management in Saaidnayel and Zahle, Lebanon." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Outfit:wght@400;500;600;700;800;900&family=Playball&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      html, body {
+        overflow-x: hidden;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+      }
+      textarea, input {
+        overflow-y: auto !important;
+        touch-action: pan-y !important;
+        user-select: text !important;
+      }
+    </style>
+    <script>
+      // Clean console warning filter for placeholder Firebase RTDB URL
+      (function() {
+        const origWarn = console.warn;
+        console.warn = function(...args) {
+          if (args[0] && typeof args[0] === 'string' && args[0].includes('FIREBASE WARNING') && args[0].includes('Please ensure that you have the URL')) {
+            return;
+          }
+          origWarn.apply(console, args);
+        };
+      })();
+    </script>
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-red-500 selection:text-white">
+    <div id="root"></div>
+
+    <!-- 
+      ==============================================================
+      CRITICAL DEVELOPER SETUP NOTES FOR FIREBASE REALTIME DATABASE:
+      If you see Firebase warnings or errors:
+      1. Open Firebase Console: https://console.firebase.google.com/
+      2. Navigate to "Realtime Database" and click "Create Database".
+      3. Ensure your database URL matches:
+         databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com"
+      4. Ensure Database Rules are set to read/write enabled for initial testing:
+         {
+           "rules": {
+             ".read": true,
+             ".write": true
+           }
+         }
+      ==============================================================
+    -->
+    <script>
+      // 1. EXPLICIT DATABASE URL CONFIGURATION (Passed directly to getDatabase)
+      window.__HAMDAR_FIREBASE_CONFIG__ = {
+        apiKey: "AIzaSyHAMDAR_FASHION_WEAR_API_KEY_PLACEHOLDER",
+        authDomain: "hamdar-fashion-wear.firebaseapp.com",
+        databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com",
+        projectId: "hamdar-fashion-wear",
+        storageBucket: "hamdar-fashion-wear.appspot.com",
+        messagingSenderId: "987654321098",
+        appId: "1:987654321098:web:abcdef1234567890"
+      };
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
