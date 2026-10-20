@@ -234,13 +234,11 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
     await updateProduct(editingProductId, updates);
     setEditingProductId(null);
-    alert('Product updated successfully!');
   };
 
-  const handleDeleteProduct = async (id: string, title: string) => {
-    if (confirm(`Are you sure you want to delete "${title}"?`)) {
-      await deleteProduct(id);
-    }
+  const handleDeleteProduct = async (id: string) => {
+    // Fully automatic non-blocking delete
+    await deleteProduct(id);
   };
 
   const handleSaveSettings = async (e: React.FormEvent) => {
@@ -757,7 +755,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
                               <button
                                 type="button"
-                                onClick={() => handleDeleteProduct(p.id, p.title)}
+                                onClick={() => handleDeleteProduct(p.id)}
                                 className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                                 title="Delete Product"
                               >
