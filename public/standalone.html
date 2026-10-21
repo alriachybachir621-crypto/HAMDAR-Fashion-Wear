@@ -41,17 +41,29 @@
   <!-- Clean Console Warning Filter for Unprovisioned Placeholder Firebase RTDB URL -->
   <script>
     (function() {
+      function shouldFilter(args) {
+        if (!args || !args.length) return false;
+        for (let i = 0; i < args.length; i++) {
+          const s = typeof args[i] === 'object' ? (JSON.stringify(args[i]) || '') : String(args[i] || '');
+          if (
+            s.includes('FIREBASE WARNING') ||
+            s.includes('ensure that you have the URL') ||
+            s.includes('hamdar-fashion-wear-default-rtdb')
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
       const origWarn = console.warn;
       console.warn = function(...args) {
-        if (
-          args[0] &&
-          typeof args[0] === 'string' &&
-          args[0].includes('FIREBASE WARNING') &&
-          args[0].includes('Please ensure that you have the URL')
-        ) {
-          return;
-        }
+        if (shouldFilter(args)) return;
         origWarn.apply(console, args);
+      };
+      const origErr = console.error;
+      console.error = function(...args) {
+        if (shouldFilter(args)) return;
+        origErr.apply(console, args);
       };
     })();
   </script>
@@ -344,22 +356,33 @@
         </button>
       </div>
 
-      <!-- 3. PIN Verification Screen (NO DEFAULT PIN TEXT SHOWN) -->
-      <div id="adminPinView" class="p-8 sm:p-10 flex flex-col items-center justify-center text-center bg-[#FAF9F6]">
-        <div class="w-14 h-14 rounded-full bg-white shadow-sm border border-stone-200 flex items-center justify-center mb-4 text-stone-800">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+      <!-- 3. PIN & Google Verification Screen -->
+      <div id="adminPinView" class="p-6 sm:p-8 flex flex-col items-center justify-center text-center bg-[#FAF9F6]">
+        <div class="w-12 h-12 rounded-full bg-white shadow-xs border border-stone-200 flex items-center justify-center mb-3 text-stone-800">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
         </div>
-        <h3 class="text-lg font-bold text-stone-900 mb-1 font-outfit">Store Owner Access</h3>
-        <p class="text-xs text-stone-500 mb-5">Enter 4-digit PIN code</p>
+        <h3 class="text-base font-bold text-stone-900 mb-1 font-outfit">Store Owner Access</h3>
+        <p class="text-xs text-stone-500 mb-4">Enter 4-digit PIN code or sign in with Google</p>
         
-        <div class="flex justify-center gap-3 mb-5">
-          <input id="adminPinInput" type="password" maxlength="4" placeholder="••••" class="w-32 text-center text-2xl tracking-widest font-mono py-2 bg-white border border-stone-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-stone-900 shadow-2xs">
+        <div class="flex justify-center gap-3 mb-3">
+          <input id="adminPinInput" type="password" maxlength="4" placeholder="••••" class="w-28 text-center text-xl tracking-widest font-mono py-2 bg-white border border-stone-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-stone-900 shadow-2xs">
         </div>
         
-        <button onclick="verifyAdminPin()" class="px-7 py-2.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 cursor-pointer shadow-xs transition-colors">
-          Unlock Console
+        <button onclick="verifyAdminPin()" class="w-full max-w-xs py-2.5 bg-stone-900 text-white text-xs font-bold rounded-xl hover:bg-stone-800 cursor-pointer shadow-xs transition-colors mb-3">
+          Unlock with PIN
         </button>
-        <p id="adminPinError" class="text-xs text-red-600 font-semibold mt-3 hidden">Incorrect PIN. Please try again.</p>
+        <p id="adminPinError" class="text-xs text-red-600 font-semibold mb-3 hidden">Incorrect PIN. Please try again.</p>
+
+        <div class="w-full max-w-xs flex items-center gap-2 my-1">
+          <div class="flex-1 h-px bg-stone-200"></div>
+          <span class="text-[10px] text-stone-400 uppercase tracking-widest font-bold">OR CLOUD AUTH</span>
+          <div class="flex-1 h-px bg-stone-200"></div>
+        </div>
+
+        <button type="button" onclick="handleAdminGoogleSignIn()" class="w-full max-w-xs py-2.5 px-4 bg-white hover:bg-stone-50 border border-stone-200 text-stone-800 text-xs font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-2xs transition-all mt-2">
+          <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+          <span>Sign in with Google (Admin)</span>
+        </button>
       </div>
 
       <!-- Authenticated Jouri-Style Dashboard -->
@@ -495,17 +518,45 @@
               </button>
             </div>
 
-            <!-- Firebase Connection Details -->
-            <div class="p-4 bg-white rounded-2xl border border-stone-200/80 shadow-2xs space-y-1.5">
+            <!-- Firebase Cloud Firestore Configuration & Live Status -->
+            <div class="p-4 bg-white rounded-2xl border border-stone-200/80 shadow-2xs space-y-3">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-stone-900 font-outfit">Firebase Realtime Database</span>
-                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Live Sync Active</span>
+                <div>
+                  <h4 class="text-xs font-bold text-stone-900 font-outfit">Cloud Firestore Database</h4>
+                  <p class="text-[11px] text-stone-500">Live single source of truth across all mobile and desktop devices</p>
+                </div>
+                <span id="firestoreStatusBadge" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Cloud Firestore Live</span>
+                </span>
               </div>
-              <p class="text-[10px] font-mono text-stone-400 break-all">
-                https://hamdar-fashion-wear-default-rtdb.firebaseio.com
-              </p>
-              <p class="text-[11px] text-stone-500 pt-1">
-                Real-time two-way listeners <code class="bg-stone-100 px-1 rounded">onValue</code> are attached to <code class="bg-stone-100 px-1 rounded">/products</code> and <code class="bg-stone-100 px-1 rounded">/settings</code>. All actions write atomically to database nodes and propagate instantly across mobile and desktop.
+
+              <div class="p-3 bg-[#FAF9F6] rounded-xl border border-stone-200/80 space-y-1.5 text-[11px] font-mono">
+                <div class="flex justify-between items-center text-stone-600">
+                  <span>Project ID:</span>
+                  <span class="font-bold text-stone-900">rich-bank-m2sm5</span>
+                </div>
+                <div class="flex justify-between items-center text-stone-600">
+                  <span>Database ID:</span>
+                  <span class="font-bold text-stone-900 truncate max-w-[200px]" title="ai-studio-hamdarfashionwea-f44e5355-4f37-4036-9598-b8455a32843f">ai-studio-hamdarfashionwea...</span>
+                </div>
+                <div class="flex justify-between items-center text-stone-600">
+                  <span>Authorized Admin:</span>
+                  <span class="font-bold text-emerald-700">alriachybachir621@gmail.com</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="resyncFirestore()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold rounded-xl cursor-pointer transition-colors">
+                  Force Sync Now
+                </button>
+                <button onclick="restoreInitialCatalog()" class="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl cursor-pointer transition-colors">
+                  Re-seed Initial Catalog
+                </button>
+              </div>
+
+              <p class="text-[11px] text-stone-500 leading-relaxed">
+                ✓ Two-way real-time listeners (<code class="bg-stone-100 px-1 py-0.5 rounded font-mono text-stone-800">onSnapshot</code>) are active on <code class="bg-stone-100 px-1 py-0.5 rounded font-mono text-stone-800">/products</code> and <code class="bg-stone-100 px-1 py-0.5 rounded font-mono text-stone-800">/settings/store</code>. Changes made on any phone appear instantaneously on all other devices without refreshing.
               </p>
             </div>
           </div>
@@ -535,35 +586,44 @@
   <!-- COMPLETE JAVASCRIPT & REAL-TIME FIREBASE DATABASE ENGINE -->
   <!-- ======================================================== -->
   <script type="module">
-    /*
-      ==============================================================
-      CRITICAL DEVELOPER SETUP NOTES FOR FIREBASE REALTIME DATABASE:
-      If you want to connect a live production Firebase project:
-      1. Open Firebase Console: https://console.firebase.google.com/
-      2. Navigate to "Realtime Database" and click "Create Database".
-      3. Under "Rules" tab, set read/write to true for initial testing:
-         {
-           "rules": {
-             ".read": true,
-             ".write": true
-           }
-         }
-      ==============================================================
-    */
-
-    // 1. TOP-LEVEL MODULAR FIREBASE REALTIME DATABASE IMPORTS
+    // 1. TOP-LEVEL MODULAR FIREBASE FIRESTORE & AUTH IMPORTS
     import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import {
+      getFirestore,
+      doc,
+      collection,
+      onSnapshot,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      getDoc,
+      getDocs,
+      getDocFromServer
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      GoogleAuthProvider,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      getStorage,
+      ref as storageRef,
+      uploadString,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-    // EXPLICIT FIREBASE CONFIGURATION
+    // EXPLICIT PRODUCTION FIREBASE CLOUD FIRESTORE CONFIGURATION
     const firebaseConfig = {
-      apiKey: "AIzaSyHAMDAR_FASHION_WEAR_API_KEY_PLACEHOLDER",
-      authDomain: "hamdar-fashion-wear.firebaseapp.com",
-      databaseURL: "https://hamdar-fashion-wear-default-rtdb.firebaseio.com",
-      projectId: "hamdar-fashion-wear",
-      storageBucket: "hamdar-fashion-wear.appspot.com",
-      messagingSenderId: "987654321098",
-      appId: "1:987654321098:web:abcdef1234567890"
+      projectId: "rich-bank-m2sm5",
+      appId: "1:264417838958:web:e7f71179350a76d1dce37f",
+      apiKey: "AIzaSyC19A-O0MnDSb4kYHppq7ksbsvndCaw87k",
+      authDomain: "rich-bank-m2sm5.firebaseapp.com",
+      firestoreDatabaseId: "ai-studio-hamdarfashionwea-f44e5355-4f37-4036-9598-b8455a32843f",
+      storageBucket: "rich-bank-m2sm5.firebasestorage.app",
+      messagingSenderId: "264417838958",
+      oAuthClientId: "264417838958-o9g7qg4c3o4l5hqg2j57ft46fhlkqtum.apps.googleusercontent.com"
     };
 
     // Initial Curated Seed Products (NO SIZE / NO STOCK)
@@ -655,18 +715,156 @@
     window.editingProductId = null;
     window.quickChangeProductId = null;
 
-    // Firebase database instance
+    // Firebase Cloud Firestore, Auth & Storage instances
     let app = null;
     let db = null;
+    let auth = null;
+    let storage = null;
 
     try {
       app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-      db = getDatabase(app, "https://hamdar-fashion-wear-default-rtdb.firebaseio.com");
+      // CRITICAL: Pass firestoreDatabaseId for multi-database Firestore instance
+      db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+      auth = getAuth(app);
+      try {
+        storage = getStorage(app);
+      } catch (stErr) {
+        console.info('Storage initialization notice:', stErr);
+      }
       window.firebaseApp = app;
       window.firebaseDb = db;
+      window.firebaseAuth = auth;
+      window.firebaseStorage = storage;
     } catch (err) {
       console.warn("Firebase app initialization note:", err);
     }
+
+    // Standardized Firestore Error Handler
+    const OperationType = {
+      CREATE: 'create',
+      UPDATE: 'update',
+      DELETE: 'delete',
+      LIST: 'list',
+      GET: 'get',
+      WRITE: 'write',
+    };
+
+    function handleFirestoreError(error, operationType, path) {
+      const errInfo = {
+        error: error instanceof Error ? error.message : String(error),
+        authInfo: {
+          userId: auth?.currentUser?.uid || null,
+          email: auth?.currentUser?.email || null,
+          emailVerified: auth?.currentUser?.emailVerified || null,
+          isAnonymous: auth?.currentUser?.isAnonymous || null,
+        },
+        operationType,
+        path
+      };
+      console.error('Firestore Error:', JSON.stringify(errInfo));
+    }
+
+    // Validate connection to Firestore
+    async function testConnection() {
+      if (!db) return;
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if (error && error.message && error.message.includes('the client is offline')) {
+          console.warn("Please check your Firebase connection or offline status.");
+        }
+      }
+    }
+    testConnection();
+
+    // Track Authenticated Admin State
+    window.currentAuthUser = null;
+    window.isAuthorizedAdmin = false;
+
+    if (auth) {
+      onAuthStateChanged(auth, (user) => {
+        window.currentAuthUser = user;
+        const isOwner = Boolean(user && user.email === "alriachybachir621@gmail.com");
+        window.isAuthorizedAdmin = isOwner;
+        updateAdminAuthUI(user, isOwner);
+      });
+    }
+
+    function updateAdminAuthUI(user, isOwner) {
+      const banner = document.getElementById('adminAuthStatusText');
+      const emailText = document.getElementById('adminUserEmailText');
+      const authBtn = document.getElementById('adminAuthBtn');
+      if (user && isOwner) {
+        if (banner) banner.innerText = 'Authenticated Admin (Write Access Enabled)';
+        if (emailText) emailText.innerText = user.email;
+        if (authBtn) {
+          authBtn.innerText = 'Sign Out';
+          authBtn.onclick = handleAdminSignOut;
+        }
+      } else if (user) {
+        if (banner) banner.innerText = 'Signed in (' + user.email + ') - Read Only';
+        if (emailText) emailText.innerText = user.email;
+        if (authBtn) {
+          authBtn.innerText = 'Switch Account';
+          authBtn.onclick = handleAdminGoogleSignIn;
+        }
+      } else {
+        if (banner) banner.innerText = 'Cloud Firestore Live (PIN or Google Auth)';
+        if (emailText) emailText.innerText = '';
+        if (authBtn) {
+          authBtn.innerText = 'Sign In Google';
+          authBtn.onclick = handleAdminGoogleSignIn;
+        }
+      }
+    }
+
+    // Google Sign-In for Admin
+    window.handleAdminGoogleSignIn = async function() {
+      if (!auth) {
+        showToast('Firebase Auth not initialized', 'error');
+        return;
+      }
+      try {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        const res = await signInWithPopup(auth, provider);
+        const user = res.user;
+        if (user.email === "alriachybachir621@gmail.com") {
+          window.isAuthorizedAdmin = true;
+          showToast('Welcome, Administrator (' + user.email + ')!');
+          // Record admin in Firestore
+          try {
+            await setDoc(doc(db, 'admins', user.uid), {
+              email: user.email,
+              role: 'admin',
+              createdAt: Date.now()
+            }, { merge: true });
+          } catch (e) {}
+          // Unlock dashboard
+          document.getElementById('adminPinView')?.classList.add('hidden');
+          document.getElementById('adminDashboardView')?.classList.remove('hidden');
+          renderAdminProductList();
+        } else {
+          showToast('Signed in as ' + user.email + '. Admin write access reserved for alriachybachir621@gmail.com.', 'error');
+        }
+      } catch (err) {
+        console.error('Google sign in error:', err);
+        showToast('Google sign in: ' + (err.message || 'Cancelled'), 'error');
+      }
+    };
+
+    window.handleAdminSignOut = async function() {
+      if (!auth) return;
+      try {
+        await signOut(auth);
+        window.currentAuthUser = null;
+        window.isAuthorizedAdmin = false;
+        showToast('Signed out of admin session.');
+        closeAdminModal();
+      } catch (e) {
+        console.error(e);
+      }
+    };
 
     // Cross-Tab Instant Synchronization Channel
     const broadcastChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
@@ -703,105 +901,116 @@
     renderProductGrid();
 
     // ==========================================
-    // GLOBAL REALTIME LISTENER ENGINE
+    // GLOBAL FIRESTORE REAL-TIME LISTENER ENGINE
     // ==========================================
     if (db) {
       try {
-        const productsRef = ref(db, 'products');
-        onValue(productsRef, (snapshot) => {
+        const productsCol = collection(db, 'products');
+        onSnapshot(productsCol, async (snapshot) => {
           try {
-            const data = snapshot.val();
-            if (data) {
-              let items = [];
-              if (Array.isArray(data)) {
-                items = data.filter(Boolean);
-              } else if (typeof data === 'object') {
-                items = Object.keys(data).map(k => ({ ...data[k], id: data[k].id || k }));
-              }
-              if (items.length > 0) {
-                // Update from database received across all devices
-                window.products = items;
-                renderProductGrid();
-                renderAdminProductList();
-                broadcastSync('PRODUCTS_UPDATED', items);
-              } else if (window._userHasDeleted) {
-                // User explicitly deleted items - keep catalog updated and do NOT re-seed
-                window.products = [];
-                renderProductGrid();
-                renderAdminProductList();
-                broadcastSync('PRODUCTS_UPDATED', []);
-              } else if (!window._seededOnce) {
-                // First initialization on genuinely empty database
-                window._seededOnce = true;
-                seedCloudCatalog();
+            if (!snapshot.empty) {
+              const items = [];
+              snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                items.push({ id: docSnap.id, ...data });
+              });
+              // Sort by createdAt descending
+              items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+              window.products = items;
+              renderProductGrid();
+              renderAdminProductList();
+              broadcastSync('PRODUCTS_UPDATED', items);
+              const badge = document.getElementById('firestoreStatusBadge');
+              if (badge) {
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span>Cloud Firestore Live (${items.length} items)</span>`;
               }
             } else {
-              // Empty snapshot
-              if (window._userHasDeleted) {
-                window.products = [];
-                renderProductGrid();
-                renderAdminProductList();
-              } else if (!window._seededOnce) {
-                window._seededOnce = true;
-                seedCloudCatalog();
+              // Collection is empty: seed curated catalog
+              if (!window._seededToFirestore) {
+                window._seededToFirestore = true;
+                seedFirestoreCatalog();
               }
             }
           } catch (err) {
-            console.warn("RTDB products parse notice:", err);
+            console.error("Products snapshot parse error:", err);
           }
         }, (error) => {
-          console.warn("RTDB products read notice:", error);
+          handleFirestoreError(error, OperationType.GET, 'products');
         });
       } catch (e) {
-        console.warn("RTDB listener error:", e);
+        console.warn("Firestore products listener setup error:", e);
       }
 
       try {
-        const settingsRef = ref(db, 'settings');
-        onValue(settingsRef, (snapshot) => {
+        const settingsDoc = doc(db, 'settings', 'store');
+        onSnapshot(settingsDoc, (snapshot) => {
           try {
-            const s = snapshot.val();
-            if (s) {
+            if (snapshot.exists()) {
+              const s = snapshot.data();
               if (s.whatsappNumber) {
                 window.whatsappNumber = s.whatsappNumber;
                 const input = document.getElementById('settingWaNumber');
                 if (input) input.value = s.whatsappNumber;
               }
-              if (s.pin) {
-                window.adminPin = String(s.pin);
+              if (s.adminPin) {
+                window.adminPin = String(s.adminPin);
               }
               broadcastSync('SETTINGS_UPDATED', s);
-            } else {
-              set(settingsRef, {
-                whatsappNumber: window.whatsappNumber,
-                pin: window.adminPin
-              }).catch(() => {});
             }
           } catch (err) {
-            console.warn("RTDB settings parse error:", err);
+            console.warn("Firestore settings snapshot error:", err);
           }
         }, (error) => {
-          console.warn("RTDB settings read notice:", error);
+          handleFirestoreError(error, OperationType.GET, 'settings/store');
         });
       } catch (e) {
-        console.warn("RTDB settings listener error:", e);
+        console.warn("Firestore settings listener setup error:", e);
       }
     }
 
-    async function seedCloudCatalog() {
+    // Seed Initial Catalog to Cloud Firestore
+    async function seedFirestoreCatalog() {
       if (!db) return;
       try {
-        const seedMap = {};
-        SEED_PRODUCTS.forEach(p => { seedMap[p.id] = p; });
-        await set(ref(db, 'products'), seedMap);
-        await set(ref(db, 'settings'), {
-          whatsappNumber: "96171554433",
-          pin: "1234"
-        });
+        for (const p of SEED_PRODUCTS) {
+          const pRef = doc(db, 'products', p.id);
+          await setDoc(pRef, {
+            ...p,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          }, { merge: true });
+        }
+        await setDoc(doc(db, 'settings', 'store'), {
+          whatsappNumber: window.whatsappNumber,
+          adminPin: window.adminPin,
+          updatedAt: Date.now()
+        }, { merge: true });
       } catch (e) {
-        console.warn("Seed catalog notice:", e);
+        console.info("Firestore cloud seed notice:", e.message);
+        window.products = [...SEED_PRODUCTS];
+        renderProductGrid();
+        renderAdminProductList();
       }
     }
+
+    window.resyncFirestore = function() {
+      showToast('Fetching latest Cloud Firestore catalog...');
+      if (db) {
+        getDocs(collection(db, 'products')).then(snap => {
+          const items = [];
+          snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+          if (items.length) {
+            items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            window.products = items;
+            renderProductGrid();
+            renderAdminProductList();
+            showToast('Catalog refreshed (' + items.length + ' products synced)');
+          }
+        }).catch(err => {
+          showToast('Sync note: ' + err.message, 'error');
+        });
+      }
+    };
 
     // ==========================================
     // NON-BLOCKING IN-APP TOAST SYSTEM (IFRAME & MOBILE SAFE)
@@ -1281,7 +1490,7 @@
     window.handleAddProductSubmit = async function() {
       const title = document.getElementById('newProdTitle').value.trim();
       const subtitle = document.getElementById('newProdSubtitle').value.trim();
-      const imageUrl = document.getElementById('newProdImageUrl').value.trim();
+      let imageUrl = document.getElementById('newProdImageUrl').value.trim();
       const cat = document.getElementById('newProdCategory').value;
       const price = parseFloat(document.getElementById('newProdPrice').value);
 
@@ -1290,29 +1499,49 @@
         return;
       }
 
+      const newId = 'prod-' + Date.now();
+
+      // If storage is available and image is data URL, upload to Firebase Storage
+      const fileInput = document.getElementById('newProdFileInput');
+      const file = fileInput?.files?.[0];
+      if (storage && file && imageUrl.startsWith('data:image')) {
+        try {
+          const cleanName = (file.name || 'image.jpg').replace(/[^a-zA-Z0-9.]/g, '_');
+          const fRef = storageRef(storage, `products/${newId}_${cleanName}`);
+          await uploadString(fRef, imageUrl, 'data_url');
+          imageUrl = await getDownloadURL(fRef);
+        } catch (stErr) {
+          console.info('Storage upload note:', stErr.message);
+        }
+      }
+
       const newProd = {
-        id: 'prod-' + Date.now(),
+        id: newId,
         title,
         subtitle: subtitle || '',
         category: cat,
         price,
         image: imageUrl,
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        updatedAt: Date.now()
       };
 
-      // Immediate local reflection
-      window.products = [newProd, ...window.products];
-      renderProductGrid();
-      renderAdminProductList();
-      broadcastSync('PRODUCTS_UPDATED', window.products);
-
-      // Direct Firebase RTDB write
+      // Direct Firestore write (with real-time propagation across all devices)
       if (db) {
         try {
-          await set(ref(db, 'products/' + newProd.id), newProd);
+          await setDoc(doc(db, 'products', newProd.id), newProd);
+          showToast('Product published to Cloud Firestore and synced globally!');
         } catch (e) {
-          console.warn("RTDB add error:", e);
+          console.error("Firestore add error:", e);
+          handleFirestoreError(e, OperationType.CREATE, 'products/' + newProd.id);
+          showToast('Error saving to Cloud Firestore: ' + (e.message || 'Permission denied. Please Sign in as Admin.'), 'error');
+          return;
         }
+      } else {
+        window.products = [newProd, ...window.products];
+        renderProductGrid();
+        renderAdminProductList();
+        showToast('Product published locally.');
       }
 
       // Reset form fields
@@ -1320,18 +1549,17 @@
       document.getElementById('newProdSubtitle').value = '';
       document.getElementById('newProdImageUrl').value = '';
       document.getElementById('newProdPrice').value = '';
-      document.getElementById('newProdFileInput').value = '';
+      if (fileInput) fileInput.value = '';
       document.getElementById('newProdPreviewContainer')?.classList.add('hidden');
       
       switchAdminTab('products');
-      showToast('Product published and synchronized in real-time!');
     };
 
     // Edit Product
     window.saveProductEdit = async function(id) {
       const title = document.getElementById(`editTitle_${id}`).value.trim();
       const subtitle = document.getElementById(`editSubtitle_${id}`).value.trim();
-      const imageUrl = document.getElementById(`editImage_${id}`).value.trim();
+      let imageUrl = document.getElementById(`editImage_${id}`).value.trim();
       const cat = document.getElementById(`editCategory_${id}`).value;
       const price = parseFloat(document.getElementById(`editPrice_${id}`).value);
 
@@ -1340,34 +1568,47 @@
         return;
       }
 
+      // If user uploaded a new local base64 image and storage is available, upload it
+      if (storage && imageUrl.startsWith('data:image')) {
+        try {
+          const fRef = storageRef(storage, `products/${id}_${Date.now()}.jpg`);
+          await uploadString(fRef, imageUrl, 'data_url');
+          imageUrl = await getDownloadURL(fRef);
+        } catch (stErr) {
+          console.info('Storage edit upload note:', stErr.message);
+        }
+      }
+
       const updates = {
+        id,
         title,
         subtitle: subtitle || '',
         image: imageUrl,
         category: cat,
-        price
+        price,
+        updatedAt: Date.now()
       };
 
-      const prod = window.products.find(p => p.id === id);
-      if (prod) {
-        Object.assign(prod, updates);
-      }
-
-      window.editingProductId = null;
-      renderProductGrid();
-      renderAdminProductList();
-      broadcastSync('PRODUCTS_UPDATED', window.products);
-
-      // Direct Firebase RTDB update
       if (db) {
         try {
-          await update(ref(db, 'products/' + id), updates);
+          await updateDoc(doc(db, 'products', id), updates);
+          window.editingProductId = null;
+          showToast('Product updated in Cloud Firestore! Propagated to all phones.');
         } catch (e) {
-          console.warn("RTDB update error:", e);
+          console.error("Firestore update error:", e);
+          handleFirestoreError(e, OperationType.UPDATE, 'products/' + id);
+          showToast('Update failed: ' + (e.message || 'Permission denied. Please Sign in as Admin.'), 'error');
         }
+      } else {
+        const prod = window.products.find(p => p.id === id);
+        if (prod) {
+          Object.assign(prod, updates);
+        }
+        window.editingProductId = null;
+        renderProductGrid();
+        renderAdminProductList();
+        showToast('Product updated locally.');
       }
-
-      showToast('Product updated and synced across all devices!');
     };
 
     // Direct "Change Image" on existing product card
@@ -1380,81 +1621,82 @@
       }
     };
 
-    // Quick Photo Replacement (Automatic Optimization & Firebase Update)
+    // Quick Photo Replacement (Automatic Storage Upload & Firestore Update)
     window.handleQuickChangeImage = async function(event) {
       const file = event.target.files && event.target.files[0];
       const prodId = window.quickChangeProductId;
       if (!file || !prodId) return;
 
       window.optimizeImageFile(file, async function(base64) {
-        const prod = window.products.find(p => p.id === prodId);
-        if (prod) {
-          prod.image = base64;
+        let finalImageUrl = base64;
+
+        if (storage) {
+          try {
+            const cleanName = (file.name || 'image.jpg').replace(/[^a-zA-Z0-9.]/g, '_');
+            const fRef = storageRef(storage, `products/${prodId}_${Date.now()}_${cleanName}`);
+            await uploadString(fRef, base64, 'data_url');
+            finalImageUrl = await getDownloadURL(fRef);
+          } catch (stErr) {
+            console.info('Storage quick change note:', stErr.message);
+          }
         }
-        renderProductGrid();
-        renderAdminProductList();
-        broadcastSync('PRODUCTS_UPDATED', window.products);
 
         if (db) {
           try {
-            await update(ref(db, 'products/' + prodId), { image: base64 });
+            await updateDoc(doc(db, 'products', prodId), {
+              image: finalImageUrl,
+              updatedAt: Date.now()
+            });
+            showToast('Photo updated in Cloud Firestore and synchronized across all devices!');
           } catch (err) {
-            console.warn('RTDB image update notice:', err);
+            console.error('Firestore image update notice:', err);
+            handleFirestoreError(err, OperationType.UPDATE, 'products/' + prodId);
+            showToast('Image update notice: ' + (err.message || 'Check admin auth'), 'error');
           }
+        } else {
+          const prod = window.products.find(p => p.id === prodId);
+          if (prod) prod.image = finalImageUrl;
+          renderProductGrid();
+          renderAdminProductList();
+          showToast('Photo updated locally.');
         }
-        showToast('Photo updated and synchronized across all devices!');
       });
     };
 
-    // ==========================================
-    // CRITICAL: FULLY AUTOMATIC DELETE PRODUCT FUNCTION
-    // NO blocking confirm() or alert() (works flawlessly in all iframes and mobile)
-    // ==========================================
+    // Dedicated Delete Product Function (Cloud Firestore)
     window.deleteProduct = async function(productId) {
       if (!productId) return;
 
       const prod = window.products.find(p => p.id === productId);
       const title = prod ? prod.title : 'Product';
 
-      // Mark that user has intentionally deleted products
-      window._userHasDeleted = true;
+      if (db) {
+        try {
+          await deleteDoc(doc(db, 'products', productId));
+          showToast(`"${title}" deleted from Cloud Firestore across all devices!`);
+        } catch (err) {
+          console.error('Firestore delete notice:', err);
+          handleFirestoreError(err, OperationType.DELETE, 'products/' + productId);
+          showToast('Delete error: ' + (err.message || 'Permission denied. Please Sign in as Admin.'), 'error');
+          return;
+        }
+      } else {
+        window.products = window.products.filter(p => String(p.id) !== String(productId));
+        renderProductGrid();
+        renderAdminProductList();
+        showToast(`"${title}" deleted locally.`);
+      }
 
-      // 1. Immediate local memory removal for instantaneous UI response
-      window.products = window.products.filter(p => String(p.id) !== String(productId));
-
-      // Cancel edit mode if deleting the currently edited item
       if (window.editingProductId === productId) {
         window.editingProductId = null;
       }
-
-      // If the product was in the customer's shopping bag, remove it
       if (Array.isArray(window.cart)) {
         window.cart = window.cart.filter(item => item && item.product && String(item.product.id) !== String(productId));
         updateCartBadge();
       }
-
-      // 2. Re-render customer product catalog & admin product list immediately
-      renderProductGrid();
-      renderAdminProductList();
-
-      // 3. Broadcast update to other open browser tabs
-      broadcastSync('PRODUCTS_UPDATED', window.products);
-
-      // 4. Atomic deletion in Firebase Realtime Database
-      if (db) {
-        try {
-          await remove(ref(db, 'products/' + productId));
-          console.log(`Product ${productId} removed from Firebase Realtime Database`);
-        } catch (err) {
-          console.warn('Firebase RTDB deletion note (fallback maintained):', err);
-        }
-      }
-
-      // 5. Automatic non-blocking in-app notification
-      showToast(`"${title}" deleted successfully from catalog`);
     };
 
-    // Change Admin PIN
+    // Change Admin PIN in Cloud Firestore
     window.handleUpdatePinSubmit = async function() {
       const newPin = document.getElementById('settingNewPin').value.trim();
       if (newPin.length !== 4 || isNaN(parseInt(newPin, 10))) {
@@ -1463,14 +1705,21 @@
       }
 
       window.adminPin = newPin;
-      broadcastSync('SETTINGS_UPDATED', { pin: newPin });
 
       if (db) {
         try {
-          await set(ref(db, 'settings/pin'), newPin);
+          await setDoc(doc(db, 'settings', 'store'), {
+            adminPin: newPin,
+            updatedAt: Date.now()
+          }, { merge: true });
+          showToast('Admin PIN updated in Cloud Firestore across all devices!');
         } catch (e) {
-          console.warn('RTDB PIN write notice:', e);
+          console.error('Firestore PIN write notice:', e);
+          handleFirestoreError(e, OperationType.WRITE, 'settings/store');
+          showToast('PIN write notice: ' + (e.message || 'Permission denied. Please Sign in as Admin.'), 'error');
         }
+      } else {
+        showToast('Admin PIN updated locally!');
       }
 
       const msg = document.getElementById('pinUpdateSuccessMsg');
@@ -1479,45 +1728,60 @@
         setTimeout(() => msg.classList.add('hidden'), 3500);
       }
       document.getElementById('settingNewPin').value = '';
-      showToast('Admin PIN updated and synced globally!');
     };
 
-    // Update WhatsApp Phone
+    // Update WhatsApp Phone in Cloud Firestore
     window.saveWhatsAppSetting = async function() {
       const val = document.getElementById('settingWaNumber').value.replace(/\D/g, '');
       if (val) {
         window.whatsappNumber = val;
-        broadcastSync('SETTINGS_UPDATED', { whatsappNumber: val });
 
         if (db) {
           try {
-            await set(ref(db, 'settings/whatsappNumber'), val);
+            await setDoc(doc(db, 'settings', 'store'), {
+              whatsappNumber: val,
+              updatedAt: Date.now()
+            }, { merge: true });
+            showToast('WhatsApp phone updated in Cloud Firestore: +' + val);
           } catch (e) {
-            console.warn('RTDB WhatsApp write notice:', e);
+            console.error('Firestore WhatsApp write notice:', e);
+            handleFirestoreError(e, OperationType.WRITE, 'settings/store');
+            showToast('Notice: ' + (e.message || 'Permission denied. Please Sign in as Admin.'), 'error');
           }
+        } else {
+          showToast('WhatsApp updated locally: +' + val);
         }
-        showToast('WhatsApp updated globally: +' + val);
       }
     };
 
-    // Reset to Seed Catalog
+    // Reset to Seed Catalog in Cloud Firestore
     window.restoreInitialCatalog = async function() {
-      window._userHasDeleted = false;
-      window.products = [...SEED_PRODUCTS];
-      renderProductGrid();
-      renderAdminProductList();
-      broadcastSync('PRODUCTS_UPDATED', window.products);
-
       if (db) {
         try {
-          const seedMap = {};
-          SEED_PRODUCTS.forEach(p => { seedMap[p.id] = p; });
-          await set(ref(db, 'products'), seedMap);
+          for (const p of SEED_PRODUCTS) {
+            await setDoc(doc(db, 'products', p.id), {
+              ...p,
+              createdAt: Date.now(),
+              updatedAt: Date.now()
+            }, { merge: true });
+          }
+          await setDoc(doc(db, 'settings', 'store'), {
+            whatsappNumber: "96171554433",
+            adminPin: "1234",
+            updatedAt: Date.now()
+          }, { merge: true });
+          showToast('Default catalog restored in Cloud Firestore and synchronized!');
         } catch (e) {
-          console.warn('RTDB reset notice:', e);
+          console.error('Firestore reset notice:', e);
+          handleFirestoreError(e, OperationType.WRITE, 'products');
+          showToast('Reset notice: ' + (e.message || 'Permission denied. Please Sign in as Admin.'), 'error');
         }
+      } else {
+        window.products = [...SEED_PRODUCTS];
+        renderProductGrid();
+        renderAdminProductList();
+        showToast('Default catalog restored locally.');
       }
-      showToast('Default catalog restored and synchronized!');
     };
 
     // ==========================================

@@ -168,17 +168,8 @@ export default function App() {
             />
           </div>
 
-          {/* Right Action Icons: User / Admin Lock & Shopping Bag */}
+          {/* Right Action Icons: Shopping Bag */}
           <div className="flex items-center gap-1 sm:gap-2">
-            {/* User Profile / Admin Quick Trigger */}
-            <button
-              onClick={() => setIsAdminOpen(true)}
-              className="p-2 rounded-full text-slate-700 hover:text-black hover:bg-slate-100 transition-colors"
-              title="Staff / Admin Access"
-              aria-label="Admin PIN Lock"
-            >
-              <User size={20} />
-            </button>
 
             {/* Shopping Bag / Cart */}
             <button
@@ -368,36 +359,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Promo Showcase: "HAMDAR New Arrivals" (Exact Reference Banner) */}
-        <section className="relative rounded-2xl overflow-hidden shadow-sm border border-slate-200 mt-8">
-          <div className="relative aspect-16/9 w-full bg-slate-900 overflow-hidden">
-            <img
-              src="/images/banner_new_arrivals_1792500659523.jpg"
-              alt="HAMDAR New Arrivals"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover opacity-90"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-            {/* Centered White Pill Card: "HAMDAR New Arrivals" */}
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-              <div
-                onClick={() => {
-                  setSelectedCategory('SALE');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="bg-white/95 backdrop-blur-md px-6 sm:px-8 py-3 rounded-2xl shadow-xl border border-white/40 flex flex-col items-center justify-center cursor-pointer hover:scale-105 active:scale-98 transition-transform"
-              >
-                <div className="flex items-center gap-1.5 font-['Outfit'] font-black text-slate-950 text-base sm:text-xl tracking-tight leading-none">
-                  <span>HAMDAR</span>
-                </div>
-                <span className="text-xs sm:text-sm font-bold text-slate-700 tracking-wide mt-0.5">
-                  New Arrivals
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Trust & Location Banner for Lebanon */}
         <div className="bg-slate-100 rounded-2xl p-4 sm:p-5 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">

@@ -1,0 +1,122 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A boutique fashion catalog product item",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique product identifier",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Product display title",
+          "maxLength": 150
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Optional short product subtitle or material note",
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "description": "Catalog category",
+          "enum": ["MEN", "WOMEN", "SALE"],
+          "maxLength": 30
+        },
+        "price": {
+          "type": "number",
+          "description": "Price in USD"
+        },
+        "originalPrice": {
+          "type": "number",
+          "description": "Original price before sale discount"
+        },
+        "image": {
+          "type": "string",
+          "description": "Product image URL or data URI",
+          "maxLength": 1000000
+        },
+        "badge": {
+          "type": "string",
+          "description": "Status badge label like Bestseller, Trending, or Sale",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed product description",
+          "maxLength": 1000
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Unix timestamp in milliseconds when product was created"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Unix timestamp in milliseconds when product was last modified"
+        }
+      },
+      "required": ["id", "title", "category", "price", "image"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Global store settings and boutique configuration",
+      "type": "object",
+      "properties": {
+        "whatsappNumber": {
+          "type": "string",
+          "description": "Phone number for direct WhatsApp ordering",
+          "maxLength": 30
+        },
+        "adminPin": {
+          "type": "string",
+          "description": "4-digit security PIN for store admin console",
+          "maxLength": 10
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Unix timestamp when settings were last modified"
+        }
+      },
+      "required": ["whatsappNumber"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized administrator user profile",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Admin email address",
+          "maxLength": 200
+        },
+        "role": {
+          "type": "string",
+          "description": "Role string e.g. admin",
+          "maxLength": 50
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Timestamp when admin access was granted"
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Public catalog products readable by all customers and editable by store administrators"
+    },
+    "/settings/{settingId}": {
+      "schema": "StoreSettings",
+      "description": "Store configuration documents readable by customers for WhatsApp ordering and editable by administrators"
+    },
+    "/admins/{adminId}": {
+      "schema": "AdminUser",
+      "description": "List of authorized administrator user IDs and emails"
+    }
+  }
+}

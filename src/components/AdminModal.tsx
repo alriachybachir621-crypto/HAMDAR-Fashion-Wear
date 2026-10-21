@@ -89,6 +89,14 @@ export const AdminModal: React.FC<AdminModalProps> = ({
     }
   };
 
+  // Remove selected image in Add Product form
+  const handleRemoveNewProductImage = () => {
+    setNewImageUrl('');
+    if (newFileInputRef.current) {
+      newFileInputRef.current.value = '';
+    }
+  };
+
   // 1 & 2. Automatic Base64 Conversion for Edit Product Image File Upload
   const handleEditProductFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -162,6 +170,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim() || !newPrice) return;
+    if (!newImageUrl.trim()) {
+      alert('Please select or upload a product image.');
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -487,17 +499,47 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                           />
                         </div>
 
-                        {/* Image Preview */}
+                        {/* Clean Empty State when no image selected */}
+                        {!newImageUrl && (
+                          <div className="flex items-center gap-2 p-2.5 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-400 text-[11px]">
+                            <ImageIcon size={15} />
+                            <span>No image selected — choose a file from device or pick a studio preset</span>
+                          </div>
+                        )}
+
+                        {/* Image Preview & Actions */}
                         {newImageUrl && (
-                          <div className="flex items-center gap-2.5 p-2 bg-slate-50 rounded-lg border border-slate-100">
-                            <img
-                              src={newImageUrl}
-                              alt="New Product Preview"
-                              className="w-12 h-12 object-cover rounded-lg border border-slate-200 bg-white"
-                            />
-                            <div className="text-[10px] leading-tight">
-                              <span className="font-bold text-emerald-700 block">✓ Photo loaded & converted to Base64</span>
-                              <span className="text-slate-400">Ready to save with product catalog</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <img
+                                src={newImageUrl}
+                                alt="New Product Preview"
+                                className="w-12 h-12 object-cover rounded-lg border border-slate-200 bg-white shrink-0"
+                              />
+                              <div className="text-[10px] leading-tight min-w-0">
+                                <span className="font-bold text-emerald-700 block truncate">✓ Photo loaded & converted to Base64</span>
+                                <span className="text-slate-400 block truncate">Ready to save with product catalog</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => newFileInputRef.current?.click()}
+                                className="py-1 px-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[11px] rounded-lg cursor-pointer transition-colors flex items-center gap-1 shadow-2xs"
+                                title="Change product image"
+                              >
+                                <Camera size={12} />
+                                <span>Change image</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleRemoveNewProductImage}
+                                className="py-1 px-2.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border border-red-200/80 font-bold text-[11px] rounded-lg cursor-pointer transition-colors flex items-center gap-1 shadow-2xs"
+                                title="Remove current image"
+                              >
+                                <Trash2 size={12} />
+                                <span>Remove image</span>
+                              </button>
                             </div>
                           </div>
                         )}
